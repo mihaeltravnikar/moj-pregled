@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moj Pregled</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0e0f11;--bg2:#141618;--bg3:#1c1e22;--bg4:#242729;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--text:#f0f0f0;--text2:#8a8f9a;--text3:#4a4f5a;--accent:#4f8ef7;--green:#34c98a;--amber:#f0a030;--red:#e85555;--purple:#a78bfa;--green-bg:rgba(52,201,138,0.1);--amber-bg:rgba(240,160,48,0.1);--red-bg:rgba(232,85,85,0.1);--blue-bg:rgba(79,142,247,0.1);--r:12px;--r-sm:8px}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px}
+nav{position:sticky;top:0;z-index:100;background:rgba(14,15,17,0.95);border-bottom:1px solid var(--border);padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:56px}
+.nav-logo{font-size:15px;font-weight:500;display:flex;align-items:center;gap:8px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--accent);display:inline-block}
+.nav-links{display:flex;gap:2px;flex-wrap:wrap}
+.nav-btn-t{padding:6px 12px;border-radius:var(--r-sm);font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;border:none;background:none;font-family:inherit;transition:all .15s}
+.nav-btn-t:hover,.nav-btn-t.on{background:var(--bg3);color:var(--text)}
+.nav-date{font-size:12px;color:var(--text3);font-family:monospace}
+main{max-width:1060px;margin:0 auto;padding:1.5rem 1.5rem 5rem}
+
+/* reuse widget styles */
+.app{font-size:14px}
+.tabs{display:flex;gap:2px;border-bottom:.5px solid var(--border);margin-bottom:1.25rem;flex-wrap:wrap}
+.tab{padding:7px 14px;border:none;background:none;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:inherit;transition:all .15s}
+.tab.on{color:var(--text);border-bottom-color:var(--text)}
+.tab:hover:not(.on){color:var(--text)}
+.sec{display:none}.sec.on{display:block}
+.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-bottom:.875rem;border-bottom:1px solid var(--border)}
+.htitle{font-size:16px;font-weight:500;display:flex;align-items:center;gap:8px}
+.hicon{width:30px;height:30px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:15px}
+.hsub{font-size:12px;color:var(--text2);margin-top:2px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:1.25rem}
+.stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:.75rem 1rem}
+.sl{font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.sv{font-size:20px;font-weight:500}
+.ss{font-size:11px;color:var(--text3);margin-top:2px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin-bottom:1.25rem}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1rem 1.125rem;transition:border-color .2s}
+.card:hover{border-color:var(--border2)}
+.ctitle{font-size:14px;font-weight:500}
+.csub{font-size:12px;color:var(--text2)}
+.div{height:1px;background:var(--border);margin:8px 0}
+.row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:13px}
+.rl{color:var(--text2)}
+.rv{font-weight:500;font-size:12px;font-family:monospace}
+.tbl{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:1.25rem}
+.th{display:grid;padding:7px 14px;background:var(--bg3);border-bottom:1px solid var(--border);font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.05em}
+.tr{display:grid;padding:10px 14px;border-bottom:1px solid var(--border);align-items:center;font-size:13px;transition:background .15s}
+.tr:last-child{border-bottom:none}
+.tr:hover{background:rgba(255,255,255,0.02)}
+.tf{padding:8px 14px;border-top:1px solid var(--border2);font-size:12px;font-weight:500;text-align:right;font-family:monospace;color:var(--text2)}
+.pill{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:500;background:var(--bg3);color:var(--text2);border:1px solid var(--border2)}
+.add{padding:5px 11px;border-radius:var(--r-sm);border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;transition:all .15s}
+.add:hover{background:var(--bg3);color:var(--text)}
+.sub-l{font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin:.875rem 0 .4rem}
+.del{background:none;border:none;cursor:pointer;color:var(--text3);font-size:14px;padding:2px 5px;border-radius:4px;line-height:1;transition:all .15s}
+.del:hover{color:var(--red);background:var(--red-bg)}
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;align-items:center;justify-content:center}
+.mo.on{display:flex}
+.md{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:1.25rem;width:min(440px,96vw);max-height:88vh;overflow-y:auto}
+.mt{font-size:15px;font-weight:500;margin-bottom:1rem}
+.fg{margin-bottom:10px}
+.fg label{display:block;font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.fg input,.fg select,.fg textarea{font-family:inherit;font-size:14px;padding:8px 11px;border:1px solid var(--border2);border-radius:var(--r-sm);background:var(--bg3);color:var(--text);width:100%;transition:border-color .15s}
+.fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--accent)}
+.fg select option{background:var(--bg3)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mf{display:flex;gap:8px;justify-content:flex-end;margin-top:1rem}
+.bc{padding:6px 13px;border-radius:var(--r-sm);border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:13px;cursor:pointer;font-family:inherit}
+.bs{padding:6px 16px;border-radius:var(--r-sm);border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit}
+.empty{text-align:center;padding:2rem;color:var(--text3);font-size:13px}
+.nav-mo{display:flex;align-items:center;gap:10px;margin-bottom:1.25rem}
+.nav-btn{padding:4px 12px;border-radius:var(--r-sm);border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-size:14px;font-family:inherit;transition:all .15s}
+.nav-btn:hover{background:var(--bg3);color:var(--text)}
+.bar-wrap{background:var(--bg3);border-radius:6px;overflow:hidden;height:24px;display:flex;margin:6px 0 4px}
+.bar-out{background:var(--red-bg);border-right:1px solid var(--red);height:100%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--red);transition:width .4s}
+.bar-in{background:var(--green-bg);height:100%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--green);transition:width .4s}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px}
+footer{text-align:center;padding:2rem;font-size:12px;color:var(--text3);border-top:1px solid var(--border)}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo"><span class="dot"></span>Moj Pregled</div>
+  <div class="nav-links" id="nav-tabs"></div>
+  <div class="nav-date" id="nav-date"></div>
+</nav>
+<main>
+<div class="app" style="position:relative" id="app">
+<div class="tabs" id="tab-bar">
+  <button class="tab on" onclick="sTab('finance',this)">💰 Finance</button>
+  <button class="tab" onclick="sTab('vozila',this)">🚗 Vozni park</button>
+  <button class="tab" onclick="sTab('stanovanje',this)">🏠 Stanovanje</button>
+  <button class="tab" onclick="sTab('narocnine',this)">💳 Naročnine</button>
+  <button class="tab" onclick="sTab('strosek',this)">🧾 Ostali stroški</button>
+</div>
+<div id="s-finance" class="sec on"></div>
+<div id="s-vozila" class="sec"></div>
+<div id="s-stanovanje" class="sec"></div>
+<div id="s-narocnine" class="sec"></div>
+<div id="s-strosek" class="sec"></div>
+</div>
+</main>
+<footer>Moj Pregled · podatki shranjeni lokalno v brskalniku</footer>
+
+<!-- MODALS -->
+<div class="mo" id="mo-fin"><div class="md">
+  <div class="mt">Vnesi plačo</div>
+  <div class="g2"><div class="fg"><label>Mesec</label><input id="f-mo" type="month"></div><div class="fg"><label>Neto plača (€)</label><input id="f-sal" type="number" step="0.01"></div></div>
+  <div class="g2"><div class="fg"><label>Varčevanje — stanje (€)</label><input id="f-sav" type="number" step="0.01"></div><div class="fg"><label>Dodatni prihodki (€)</label><input id="f-ext" type="number" step="0.01" placeholder="0.00"></div></div>
+  <div class="g2"><div class="fg"><label>Tekoči račun (€)</label><input id="f-chk" type="number" step="0.01" placeholder="0.00"></div><div class="fg"><label>Revolut (€)</label><input id="f-rev" type="number" step="0.01" placeholder="0.00"></div></div>
+  <div class="fg"><label>Kreditna kartica — dolg (€)</label><input id="f-cc" type="number" step="0.01" placeholder="0.00 = poplačana"></div>
+  <div class="fg"><label>Opomba</label><input id="f-note" placeholder="bonus, najem..."></div>
+  <div class="mf"><button class="bc" onclick="cm('mo-fin')">Prekliči</button><button class="bs" onclick="saveFin()">Shrani</button></div>
+</div></div>
+<div class="mo" id="mo-v"><div class="md">
+  <div class="mt">Dodaj vozilo</div>
+  <div class="fg"><label>Naziv</label><input id="v-n"></div>
+  <div class="g2"><div class="fg"><label>Znamka</label><input id="v-mk"></div><div class="fg"><label>Model</label><input id="v-mo"></div></div>
+  <div class="g2"><div class="fg"><label>Letnik</label><input id="v-yr" type="number"></div><div class="fg"><label>Reg. tablica</label><input id="v-rg"></div></div>
+  <div class="g2"><div class="fg"><label>Km</label><input id="v-km" type="number"></div><div class="fg"><label>Gorivo</label><select id="v-fu"><option>Bencin</option><option>Dizel</option><option>Hibrid</option><option>Električno</option></select></div></div>
+  <div class="mf"><button class="bc" onclick="cm('mo-v')">Prekliči</button><button class="bs" onclick="saveV()">Shrani</button></div>
+</div></div>
+<div class="mo" id="mo-ins"><div class="md">
+  <div class="mt">Dodaj zavarovanje</div>
+  <div class="fg"><label>Vozilo</label><select id="i-v"></select></div>
+  <div class="fg"><label>Vrsta</label><select id="i-t"><option>Paket MAX</option><option>AO zavarovanje</option><option>Kasko zavarovanje</option><option>Asistenca</option><option>Drugo</option></select></div>
+  <div class="fg"><label>Zavarovalnica</label><input id="i-co" placeholder="Allianz, Triglav..."></div>
+  <div class="g2"><div class="fg"><label>Datum plačila</label><input id="i-pd" type="date"></div><div class="fg"><label>Znesek (€)</label><input id="i-am" type="number" step="0.01"></div></div>
+  <div class="g2"><div class="fg"><label>Veljavnost do</label><input id="i-to" type="date"></div><div class="fg"><label>Št. police</label><input id="i-po"></div></div>
+  <div class="mf"><button class="bc" onclick="cm('mo-ins')">Prekliči</button><button class="bs" onclick="saveIns()">Shrani</button></div>
+</div></div>
+<div class="mo" id="mo-svc"><div class="md">
+  <div class="mt">Dodaj servis</div>
+  <div class="fg"><label>Vozilo</label><select id="svc-v"></select></div>
+  <div class="g2"><div class="fg"><label>Datum</label><input id="svc-d" type="date"></div><div class="fg"><label>Vrsta</label><select id="svc-t"><option>Redni servis</option><option>Menjava olja</option><option>Menjava gum</option><option>Zavore</option><option>Popravilo</option><option>Drugo</option></select></div></div>
+  <div class="g2"><div class="fg"><label>Strošek (€)</label><input id="svc-p" type="number" step="0.01"></div><div class="fg"><label>Km</label><input id="svc-km" type="number"></div></div>
+  <div class="fg"><label>Naslednji servis datum</label><input id="svc-nd" type="date"></div>
+  <div class="fg"><label>Opomba</label><input id="svc-no"></div>
+  <div class="mf"><button class="bc" onclick="cm('mo-svc')">Prekliči</button><button class="bs" onclick="saveSvc()">Shrani</button></div>
+</div></div>
+<div class="mo" id="mo-hm"><div class="md">
+  <div class="mt">Dodaj strošek stanovanja</div>
+  <div class="fg"><label>Kategorija</label><select id="h-c"><option>Internet &amp; TV</option><option>Zavarovanje stanovanja</option><option>Naročnina (tiskalnik)</option><option>Netflix</option><option>Spotify</option><option>RTV prispevek</option><option>Vzdrževanje &amp; popravila</option><option>Drugo</option></select></div>
+  <div class="g2"><div class="fg"><label>Datum</label><input id="h-d" type="date"></div><div class="fg"><label>Znesek (€)</label><input id="h-a" type="number" step="0.01"></div></div>
+  <div class="g2"><div class="fg"><label>Ponudnik</label><input id="h-p"></div><div class="fg"><label>Opomba</label><input id="h-n"></div></div>
+  <div class="mf"><button class="bc" onclick="cm('mo-hm')">Prekliči</button><button class="bs" onclick="saveHm()">Shrani</button></div>
+</div></div>
+<div class="mo" id="mo-sub"><div class="md">
+  <div class="mt">Dodaj naročnino</div>
+  <div class="fg"><label>Naziv</label><input id="sb-n" placeholder="iCloud, Adobe..."></div>
+  <div class="g2"><div class="fg"><label>Kategorija</label><select id="sb-c"><option>Programska oprema</option><option>Oblak / shranjevanje</option><option>Igre &amp; zabava</option><option>Fitnes &amp; zdravje</option><option>Izobraževanje</option><option>Varnost &amp; VPN</option><option>Ostalo</option></select></div><div class="fg"><label>Pogostost</label><select id="sb-f"><option>Mesečno</option><option>Letno</option><option>Enkratno</option></select></div></div>
+  <div class="g2"><div class="fg"><label>Znesek (€)</label><input id="sb-a" type="number" step="0.01"></div><div class="fg"><label>Dan plačila</label><input id="sb-dy" type="number" min="1" max="31"></div></div>
+  <div class="g2"><div class="fg"><label>Zadnje plačilo</label><input id="sb-d" type="date"></div><div class="fg"><label>Opomba</label><input id="sb-no"></div></div>
+  <div class="mf"><button class="bc" onclick="cm('mo-sub')">Prekliči</button><button class="bs" onclick="saveSub()">Shrani</button></div>
+</div></div>
+<div class="mo" id="mo-exp"><div class="md">
+  <div class="mt">Dodaj strošek</div>
+  <div class="g2"><div class="fg"><label>Datum</label><input id="e-d" type="date"></div><div class="fg"><label>Kategorija</label><select id="e-c"><option>Izlet</option><option>Darilo</option><option>Oblačila</option><option>Restavracija</option><option>Šport &amp; rekreacija</option><option>Zdravje</option><option>Dom &amp; oprema</option><option>Potovanje</option><option>Drugo</option></select></div></div>
+  <div class="fg"><label>Znesek (€)</label><input id="e-a" type="number" step="0.01"></div>
+  <div class="fg"><label>Opis</label><input id="e-n" placeholder="npr. Izlet Piran..."></div>
+  <div class="mf"><button class="bc" onclick="cm('mo-exp')">Prekliči</button><button class="bs" onclick="saveExp()">Shrani</button></div>
+</div></div>
+
+<script>
+
+const INIT={"vehicles":[{"id":"v1","name":"Ford Focus RS","make":"Ford","model":"Focus RS","year":"2017","reg":"LJ 80-SPK","km":"128000","kmDate":"2026-07-14","fuel":"Bencin"},{"id":"v2","name":"Ford Focus ST-Line","make":"Ford","model":"Focus ST-Line","year":"2017","reg":"LJ 50-MV2","km":"132332","kmDate":"2026-07-14","fuel":"Bencin"}],"insurances":[{"id":"i1","vehicleId":"v2","type":"Paket MAX (AO+Kasko+AO Plus+Asistenca+Nezgodno)","company":"Allianz Slovenija","paid":"2025-12-20","to":"2026-12-20","premium":"514.37","policy":"44002653076"},{"id":"i2","vehicleId":"v1","type":"Paket MAX (AO+Kasko+AO Plus+Asistenca+Nezgodno)","company":"Allianz Slovenija","paid":"2026-03-01","to":"2027-03-01","premium":"1040.36","policy":"44002725108"}],"expenses":[{"id":"exp1","date":"2026-06-14","category":"Šport & rekreacija","amount":"84.00","note":"Karting"},{"id":"exp2","date":"2026-06-15","category":"Restavracija","amount":"260.00","note":"Gostilna oči — obrok 1/2 (poplačano)"},{"id":"exp4","date":"2026-08-15","category":"Darilo","amount":"100.00","note":"Mami — očetova žurka"},{"id":"exp3","date":"2026-08-15","category":"Restavracija","amount":"100.00","note":"Gostilna oči — obrok 2/2 (poplačano ✓)"}],"services":[{"id":"svc0","vehicleId":"v1","date":"2025-11-01","type":"Redni servis","shop":"","price":"293.00","km":"","nextDate":"2026-10-01","nextKm":"","note":"Zadnji servis november 2025, 293€. Naslednji oktober 2026. Interval: 10–11 mes. ali 7–9k km. Olje: 0W-40 5L (Autodoc 71€).","parts":[]},{"id":"svc1","vehicleId":"v2","date":"2026-07-11","type":"Redni servis","shop":"Servisni center","price":"434.00","km":"","nextDate":"2027-03-14","nextKm":"","note":"Servis ST-Line 11.7.2026. Delo: 186€, deli/material: 248€. Skupaj: 434€. Olje 5W-20 5L. Svečke naslednjič julij 2027. Interval: 1 leto ali 20k km.","parts":[]}],"homeExpenses":[{"id":"h1","category":"Internet & TV","date":"2026-05-18","amount":"41.59","provider":"T-2","note":"Plačilo 18. v mesecu"},{"id":"h2","category":"Zavarovanje stanovanja","date":"2026-04-01","amount":"58.90","provider":"","note":"Obrok 1/7 (april 2026), pogodba do 2030"},{"id":"h3","category":"Naročnina (tiskalnik)","date":"2026-05-13","amount":"5.49","provider":"HP","note":"Mesečna naročnina"},{"id":"h4","category":"Netflix","date":"2026-05-05","amount":"10.99","provider":"Netflix","note":"Mesečna naročnina"},{"id":"h5","category":"Spotify","date":"2026-05-06","amount":"12.49","provider":"Spotify","note":"Mesečna naročnina"},{"id":"h6","category":"RTV prispevek","date":"2026-05-01","amount":"14.02","provider":"RTV Slovenija","note":"Mesečni prispevek"}],"savingsGoals":[{"id":"sg1","name":"Nov avto","icon":"🚗","target":"7000","current":"1050","lastUpdate":"2026-08-15","deadline":"2027-12-31","color":"#4f8ef7","note":"Cilj do konca 2027"}],"finances":[{"id":"fin-avg2026","month":"2026-08","salary":"1445.00","savings":"1050.00","extra":"0","checking":"0","revolut":"140.00","creditCard":"0.00","note":"Plača 1445€ · Revolut napolnjen 140€ · Mami 100€ za očetovo žurko"},{"id":"fin-jul2026","month":"2026-07","salary":"1580.00","savings":"460.00","extra":"0","checking":"0","revolut":"8.00","creditCard":"0.00","note":"Varčevanje 460€ · Revolut 8€ — takoj napolni!"},{"id":"fin-jun2026","month":"2026-06","salary":"1360.00","savings":"1500.00","extra":"1600.00","checking":"663.00","revolut":"110.00","creditCard":"0.00","note":"Plača 1360€ + Regres 1600€. KK 240€ poplačana 15.6."},{"id":"fin-maj2026","month":"2026-05","salary":"1499.00","savings":"500.00","extra":"0","revolut":"140.00","checking":"34.00","note":"Plača 15.5. · Tekoči: 34€ · Revolut: 140€ · Varčevanje: 500€"}],"subscriptions":[{"id":"sub1","name":"Canva","cat":"Programska oprema","freq":"Mesečno","amount":"12.00","day":"3","date":"2026-05-03","note":"Revolut"},{"id":"sub2","name":"Google One","cat":"Oblak / shranjevanje","freq":"Mesečno","amount":"9.99","day":"3","date":"2026-05-03","note":"Revolut"},{"id":"sub3","name":"Revolut","cat":"Ostalo","freq":"Mesečno","amount":"8.99","day":"5","date":"2026-05-05","note":""},{"id":"sub5","name":"Apple","cat":"Oblak / shranjevanje","freq":"Mesečno","amount":"2.99","day":"26","date":"2026-05-26","note":"Revolut"},{"id":"sub6","name":"Claude (Anthropic)","cat":"Programska oprema","freq":"Mesečno","amount":"21.00","day":"15","date":"2026-06-15","note":"Tekoči račun"}]};
+
+let db;
+const MN=['Januar','Februar','Marec','April','Maj','Junij','Julij','Avgust','September','Oktober','November','December'];
+let _fm=new Date().toISOString().slice(0,7);
+
+document.getElementById('nav-date').textContent=new Date().toLocaleDateString('sl-SI',{weekday:'short',day:'numeric',month:'long',year:'numeric'});
+
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function euro(v){return parseFloat(v||0).toFixed(2)+' €'}
+function daysTo(d){return Math.round((new Date(d)-new Date())/864e5)}
+function vn(id){const v=db.vehicles.find(x=>x.id===id);return v?v.reg||v.name:'—'}
+function pvs(id){const el=document.getElementById(id);if(!el)return;el.innerHTML=db.vehicles.map(v=>`<option value="${v.id}">${v.name} (${v.reg})</option>`).join('')}
+function om(id){document.getElementById(id).classList.add('on')}
+function cm(id){document.getElementById(id).classList.remove('on')}
+document.querySelectorAll('.mo').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('on')}));
+
+function init(){
+  db=JSON.parse(JSON.stringify(INIT));
+  try{
+    const d=localStorage.getItem('mpv3');
+    if(d){
+      const s=JSON.parse(d);
+      ['vehicles','insurances','expenses','services','homeExpenses','finances','subscriptions','savingsGoals'].forEach(k=>{
+        if(!s[k])s[k]=[];
+        INIT[k].forEach(item=>{if(!s[k].find(x=>x.id===item.id))s[k].push(item)});
+      });
+      db=s;
+    }
+  }catch(e){}
+  const td=new Date().toISOString().slice(0,10);
+  ['i-pd','svc-d','h-d','e-d','sb-d'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=td});
+  document.getElementById('f-mo').value=td.slice(0,7);
+  rAll();
+}
+
+function persist(){try{localStorage.setItem('mpv3',JSON.stringify(db))}catch(e){}}
+
+function sTab(id,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('s-'+id).classList.add('on');
+}
+
+function rAll(){rFin();rVoz();rStan();rNar();rExp()}
+
+function rFin(){
+  const el=document.getElementById('s-finance');
+  const [yr,mo]=_fm.split('-').map(Number);
+  const mn=MN[mo-1]+' '+yr;
+  const fe=db.finances.find(f=>f.month===_fm);
+  const sal=fe?parseFloat(fe.salary||0):0;
+  const ext=fe?parseFloat(fe.extra||0):0;
+  const sav=fe?parseFloat(fe.savings||0):0;
+  const totalIn=sal+ext;
+  const items=[];
+  const rc=[{c:'Internet & TV',i:'📡'},{c:'Naročnina (tiskalnik)',i:'🖨️'},{c:'Netflix',i:'🎬'},{c:'Spotify',i:'🎵'},{c:'RTV prispevek',i:'📺'}];
+  rc.forEach(r=>{const last=db.homeExpenses.filter(e=>e.category===r.c).sort((a,b)=>new Date(b.date)-new Date(a.date))[0];if(last)items.push({label:r.c,i:r.i,amt:parseFloat(last.amount||0),sec:'Stanovanje',day:null,tip:'mesečno'})});
+  if(mo>=4&&mo<=10){const last=db.homeExpenses.filter(e=>e.category==='Zavarovanje stanovanja').sort((a,b)=>new Date(b.date)-new Date(a.date))[0];if(last)items.push({label:'Zavarovanje stanovanja',i:'🛡️',amt:parseFloat(last.amount||0),sec:'Stanovanje',day:null,tip:'sezonsko',note:'obrok '+(mo-3)+'/7'})}
+  db.subscriptions.filter(s=>s.freq==='Mesečno').forEach(s=>{items.push({label:s.name,i:'💳',amt:parseFloat(s.amount||0),sec:'Naročnine',day:parseInt(s.day)||null,tip:'mesečno'})});
+  db.subscriptions.filter(s=>s.freq==='Letno'&&s.date).forEach(s=>{if(parseInt(s.date.slice(5,7))===mo)items.push({label:s.name+' (letno)',i:'💳',amt:parseFloat(s.amount||0),sec:'Naročnine',day:parseInt(s.day)||null,tip:'letno'})});
+  db.insurances.forEach(i=>{const tMo=i.to?parseInt(i.to.slice(5,7)):null,tYr=i.to?parseInt(i.to.slice(0,4)):null;if(tMo===mo&&tYr===yr){const v=db.vehicles.find(x=>x.id===i.vehicleId);items.push({label:'Zavarovanje '+(v?v.reg:''),i:'🚗',amt:parseFloat(i.premium||0),sec:'Vozni park',day:null,tip:'letno',note:'podaljšanje'})}});
+  // Kreditna kartica - prikaži če ima dolg
+  const feCc=parseFloat(fe&&fe.creditCard||0);
+  if(feCc>0) items.push({label:'Kreditna kartica',i:'💳',amt:feCc,sec:'Ostalo',day:null,tip:'enkratno',note:'poplačilo'});
+  db.services.forEach(s=>{if(!s.nextDate)return;const nMo=parseInt(s.nextDate.slice(5,7)),nYr=parseInt(s.nextDate.slice(0,4));if(nMo===mo&&nYr===yr){const v=db.vehicles.find(x=>x.id===s.vehicleId);items.push({label:'Servis '+(v?v.reg:''),i:'🔧',amt:parseFloat(s.price||0),sec:'Vozni park',day:s.date?parseInt(s.date.slice(8)):null,tip:'servis',note:s.price?'zadnji: '+euro(s.price):'cena ni znana'})}});
+  const totalOut=items.reduce((a,i)=>a+i.amt,0);
+  const bal=totalIn-totalOut;
+  const outPct=totalIn>0?Math.min(Math.round(totalOut/totalIn*100),100):0;
+  const balPct=100-outPct;
+  const secs={};items.forEach(i=>{if(!secs[i.sec])secs[i.sec]=[];secs[i.sec].push(i)});
+  let h=`<div class="hdr"><div><div class="htitle"><div class="hicon" style="background:var(--green-bg)">💰</div>Finance</div><div class="hsub">Plača: 15. v mesecu</div></div><button class="add" onclick="om('mo-fin');document.getElementById('f-mo').value='${_fm}'">+ Vnesi plačo</button></div>`;
+  // Savings goals
+  const sgHtml=rSavings();
+  if(sgHtml){
+    h+=`<div style="display:flex;align-items:center;justify-content:space-between"><div class="sub-l" style="margin:0">Varčevalni cilji</div><button class="add" onclick="om('mo-sg')">+ Dodaj cilj</button></div><div style="margin-bottom:.5rem"></div>`;
+    h+=sgHtml;
+  } else {
+    h+=`<div style="display:flex;justify-content:flex-end;margin-bottom:.5rem"><button class="add" onclick="om('mo-sg')">+ Dodaj varčevalni cilj</button></div>`;
+  }
+  h+=`<div class="nav-mo"><button class="nav-btn" onclick="chMo(-1)">‹</button><div style="flex:1;text-align:center;font-size:17px;font-weight:500;letter-spacing:-.3px">${mn}</div><button class="nav-btn" onclick="chMo(1)">›</button></div>`;
+  h+=`<div class="stats"><div class="stat"><div class="sl">Prihodki</div><div class="sv" style="color:var(--green)">${fe?euro(totalIn):'—'}</div><div class="ss">${ext>0?'+'+euro(ext)+' dodatno':'15. '+MN[mo-1]}</div></div><div class="stat"><div class="sl">Odhodki</div><div class="sv" style="color:var(--red)">${euro(totalOut)}</div><div class="ss">${items.length} postavk</div></div><div class="stat"><div class="sl">${bal>=0?'Preostanek':'Primanjkljaj'}</div><div class="sv" style="color:${fe?(bal>=0?'var(--green)':'var(--red)'):'var(--text3)'}">${fe?euro(Math.abs(bal)):'—'}</div><div class="ss">${fe?(bal>=0?'na voljo':'preseženost'):'vnesi plačo'}</div></div><div class="stat"><div class="sl">Varčevanje</div><div class="sv" style="color:var(--accent)">${sav>0?euro(sav):'—'}</div><div class="ss">stanje</div></div></div>`;
+  if(fe&&totalIn>0){h+=`<div class="card" style="margin-bottom:1.25rem"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:5px"><span>Odhodki ${euro(totalOut)} (${outPct}%)</span><span>Preostanek ${euro(bal)}</span></div><div class="bar-wrap"><div class="bar-out" style="width:${outPct}%">${outPct>18?euro(totalOut):''}</div><div class="bar-in" style="width:${balPct}%">${balPct>18?euro(bal):''}</div></div><div style="display:flex;gap:12px;font-size:11px;margin-top:5px"><span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;background:var(--red-bg);border:1px solid var(--red);border-radius:2px;display:inline-block"></span><span style="color:var(--text3)">Odhodki</span></span><span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;background:var(--green-bg);border:1px solid var(--green);border-radius:2px;display:inline-block"></span><span style="color:var(--text3)">Preostanek</span></span></div></div>`}
+  Object.entries(secs).forEach(([sec,si])=>{
+    const st=si.reduce((a,i)=>a+i.amt,0);
+    h+=`<div style="display:flex;justify-content:space-between;align-items:center" class="sub-l"><span>${sec}</span><span style="font-family:monospace;font-weight:500;font-size:12px">${euro(st)}</span></div>`;
+    h+=`<div class="tbl" style="margin-bottom:1rem"><div class="th" style="grid-template-columns:2.5fr .8fr .8fr 1.1fr"><span>Postavka</span><span>Tip</span><span>Dan</span><span style="text-align:right">Znesek</span></div>`;
+    si.sort((a,b)=>(a.day||99)-(b.day||99)).forEach(i=>{
+      const tc=i.tip!=='mesečno'?'color:var(--'+(i.tip==='letno'?'accent':i.tip==='sezonsko'?'green':'amber')+')':'';
+      h+=`<div class="tr" style="grid-template-columns:2.5fr .8fr .8fr 1.1fr"><div><span style="font-size:14px;margin-right:6px">${i.i}</span><span style="font-weight:500">${i.label}</span>${i.note?`<span style="font-size:11px;color:var(--text3);margin-left:5px">${i.note}</span>`:''}</div><div><span class="pill" style="${tc}">${i.tip}</span></div><div style="font-family:monospace;font-size:12px;color:var(--text2)">${i.day?i.day+'.':'—'}</div><div style="font-weight:500;text-align:right;font-family:monospace">${i.amt>0?euro(i.amt):'?'}</div></div>`;
+    });
+    h+=`<div class="tf">Skupaj ${sec}: ${euro(st)}</div></div>`;
+  });
+  if(!items.length)h+=`<div class="empty" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r)">Ta mesec ni načrtovanih odhodkov.</div>`;
+  const fh=[...db.finances].sort((a,b)=>b.month.localeCompare(a.month));
+  if(fh.length){h+=`<div class="sub-l">Zgodovina plač</div><div class="tbl"><div class="th" style="grid-template-columns:1fr 1.2fr 1fr 1fr 1fr 1fr 1fr 28px"><span>Mesec</span><span>Plača</span><span>Varčevanje</span><span>Tekoči</span><span>Revolut</span><span>KK dolg</span><span>Opomba</span><span></span></div>`;fh.forEach(f=>{h+=`<div class="tr" style="grid-template-columns:1fr 1.2fr 1fr 1fr 1fr 1fr 1fr 28px"><div style="font-weight:500;font-family:monospace;font-size:12px">${f.month}</div><div style="color:var(--green);font-weight:500">${euro(f.salary)}${parseFloat(f.extra||0)>0?`<span style="font-size:11px;color:var(--text3);margin-left:4px">+${euro(f.extra)}</span>`:''}</div><div style="color:var(--accent);font-family:monospace;font-size:12px">${euro(f.savings)}</div><div style="font-family:monospace;font-size:12px">${f.checking?euro(f.checking):'—'}</div><div style="font-family:monospace;font-size:12px">${f.revolut?euro(f.revolut):'—'}</div><div style="font-family:monospace;font-size:12px;color:${f.creditCard&&parseFloat(f.creditCard)>0?'var(--red)':'var(--text2)'}">${f.creditCard&&parseFloat(f.creditCard)>0?'-'+euro(f.creditCard):'✓'}</div><div style="font-size:12px;color:var(--text2)">${f.note||'—'}</div><div><button class="del" onclick="delI('finances','${f.id}')">✕</button></div></div>`});h+=`</div>`}
+  el.innerHTML=h;
+}
+function chMo(d){const [yr,mo]=_fm.split('-').map(Number);let nm=mo+d,ny=yr;if(nm>12){nm=1;ny++}if(nm<1){nm=12;ny--}_fm=ny+'-'+(nm<10?'0':'')+nm;rFin()}
+
+function rVoz(){
+  const el=document.getElementById('s-vozila');
+  const insT=db.insurances.reduce((a,i)=>a+parseFloat(i.premium||0),0);
+  const ni=[...db.insurances].filter(i=>daysTo(i.to)>=-1).sort((a,b)=>daysTo(a.to)-daysTo(b.to))[0];
+  const nd=ni?daysTo(ni.to):null;
+  let h=`<div class="hdr"><div><div class="htitle"><div class="hicon" style="background:var(--blue-bg)">🚗</div>Vozni park</div><div class="hsub">Vozila, zavarovanja, servisi</div></div><button class="add" onclick="om('mo-v')">+ Dodaj vozilo</button></div>`;
+  h+=`<div class="stats"><div class="stat"><div class="sl">Vozila</div><div class="sv" style="color:var(--accent)">${db.vehicles.length}</div></div><div class="stat"><div class="sl">Zavarovanja</div><div class="sv">${euro(insT)}</div><div class="ss">skupaj</div></div><div class="stat"><div class="sl">Naslednji rok</div><div class="sv" style="color:${nd!==null&&nd<=60?'var(--amber)':'var(--green)'}">${nd!==null?nd+' dni':'—'}</div><div class="ss">${ni?ni.to:''}</div></div></div>`;
+  h+=`<div class="sub-l">Vozila</div><div class="cards">`;
+  db.vehicles.forEach(v=>{
+    const vi=[...db.insurances].filter(i=>i.vehicleId===v.id&&daysTo(i.to)>=-1).sort((a,b)=>daysTo(a.to)-daysTo(b.to))[0];
+    const vs=[...db.services].filter(s=>s.vehicleId===v.id).sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
+    h+=`<div class="card"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div class="ctitle">${v.name}</div><div class="csub">${v.make} ${v.model} · ${v.year} · ${v.fuel}</div></div><div style="display:flex;align-items:center;gap:6px"><span style="font-family:monospace;font-size:11px;padding:3px 8px;border-radius:4px;background:var(--bg3);color:var(--text2)">${v.reg}</span><button class="del" onclick="delI('vehicles','${v.id}')">✕</button></div></div><div class="div"></div><div class="row"><span class="rl">Km stanje</span><span style="display:flex;align-items:center;gap:6px"><span class="rv">${v.km?Number(v.km).toLocaleString('sl-SI')+' km':'—'}</span>${v.kmDate?`<span style="font-size:11px;color:var(--text3)">(${v.kmDate})</span>`:''}<button onclick="updKm('${v.id}')" style="border:1px solid var(--border2);border-radius:4px;background:none;color:var(--text3);font-size:11px;padding:2px 6px;cursor:pointer;font-family:inherit">+</button></span></div><div class="row"><span class="rl">Zavarovanje do</span><span class="rv" style="font-family:inherit">${vi?vi.to:'—'}</span></div><div class="row"><span class="rl">Zadnji servis</span><span class="rv" style="font-family:inherit">${vs?vs.date:'—'}</span></div><div class="row"><span class="rl">Naslednji servis</span><span class="rv" style="font-family:inherit">${vs&&vs.nextDate?vs.nextDate:'—'}</span></div></div>`;
+  });
+  h+=`</div>`;
+  h+=`<div style="display:flex;align-items:center;justify-content:space-between"><div class="sub-l" style="margin:0">Servisi</div><button class="add" onclick="om('mo-svc');pvs('svc-v')">+ Dodaj</button></div><div style="margin-bottom:.5rem"></div><div class="cards">`;
+  [...db.services].sort((a,b)=>new Date(b.date)-new Date(a.date)).forEach(s=>{
+    const v=db.vehicles.find(x=>x.id===s.vehicleId);
+    const nd=s.nextDate?daysTo(s.nextDate):null;
+    const nm=nd!==null?Math.round(Math.abs(nd)/30.5):0;
+    let cb='';
+    if(nd!==null){const col=nd<0?'red':nd<=14?'red':nd<=60?'amber':'green';const lbl=nd<0?Math.abs(nd)+' dni zamude':nd+' dni · '+nm+' mes.';const txt=nd<0?'Zamuja!':nd<=14?'Kmalu!':nd<=60?'Prihaja':'Naslednji termin';cb=`<div style="background:var(--${col}-bg);border:1px solid var(--${col});border-radius:var(--r-sm);padding:9px 12px;margin-top:10px"><div style="font-size:11px;font-weight:500;color:var(--${col});text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px">${txt}</div><div style="font-size:20px;font-weight:500;color:var(--${col})">${lbl}</div><div style="font-size:11px;color:var(--${col});opacity:.8;margin-top:1px">${s.nextDate}</div></div>`}
+    h+=`<div class="card"><div style="display:flex;justify-content:space-between"><div><div class="ctitle">${v?v.name:'—'}</div><div class="csub">${v?v.reg:''} · ${s.type}</div></div><button class="del" onclick="delI('services','${s.id}')">✕</button></div><div class="div"></div><div class="row"><span class="rl">Zadnji servis</span><span class="rv" style="font-family:inherit">${s.date||'—'}</span></div><div class="row"><span class="rl">Strošek</span><span class="rv">${s.price?euro(s.price):'—'}</span></div>${s.note?`<div style="font-size:12px;color:var(--text2);margin-top:6px;line-height:1.5">${s.note}</div>`:''}${cb}</div>`;
+  });
+  if(!db.services.length)h+=`<div class="empty">Ni servisov.</div>`;
+  h+=`</div>`;
+  h+=`<div style="display:flex;align-items:center;justify-content:space-between"><div class="sub-l" style="margin:0">Zavarovanja</div><button class="add" onclick="om('mo-ins');pvs('i-v')">+ Dodaj</button></div><div style="margin-bottom:.5rem"></div>`;
+  h+=`<div class="tbl"><div class="th" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 28px"><span>Vrsta</span><span>Vozilo</span><span>Plačano</span><span>Znesek</span><span>Do</span><span></span></div>`;
+  [...db.insurances].sort((a,b)=>daysTo(a.to)-daysTo(b.to)).forEach(i=>{const d=daysTo(i.to);const bc=d<0?'var(--red)':d<=60?'var(--amber)':'var(--green)';h+=`<div class="tr" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 28px"><div><div style="font-weight:500;font-size:13px">${i.type}</div><div style="font-size:11px;color:var(--text3)">${i.company}${i.policy?' · #'+i.policy:''}</div></div><div style="font-size:12px;color:var(--text2)">${vn(i.vehicleId)}</div><div style="font-family:monospace;font-size:12px">${i.paid||'—'}</div><div style="font-weight:500">${euro(i.premium)}</div><div><span style="color:${bc};font-size:12px;font-weight:500">${d<0?'Poteklo':d+'d'}</span></div><div><button class="del" onclick="delI('insurances','${i.id}')">✕</button></div></div>`});
+  h+=`</div>`;
+  el.innerHTML=h;
+}
+
+function rStan(){
+  const el=document.getElementById('s-stanovanje');
+  const cats=[{k:'Internet & TV',i:'📡'},{k:'Zavarovanje stanovanja',i:'🛡️'},{k:'Naročnina (tiskalnik)',i:'🖨️'},{k:'Netflix',i:'🎬'},{k:'Spotify',i:'🎵'},{k:'RTV prispevek',i:'📺'},{k:'Vzdrževanje & popravila',i:'🔨'}];
+  const m=new Date().toISOString().slice(0,7);
+  const mT=db.homeExpenses.filter(e=>e.date&&e.date.startsWith(m)).reduce((a,e)=>a+parseFloat(e.amount||0),0);
+  const yT=db.homeExpenses.filter(e=>e.date&&e.date.startsWith('2026')).reduce((a,e)=>a+parseFloat(e.amount||0),0);
+  const recT=['Internet & TV','Naročnina (tiskalnik)','Netflix','Spotify','RTV prispevek'].reduce((s,k)=>{const l=db.homeExpenses.filter(e=>e.category===k).sort((a,b)=>new Date(b.date)-new Date(a.date))[0];return s+(l?parseFloat(l.amount||0):0)},0);
+  let h=`<div class="hdr"><div><div class="htitle"><div class="hicon" style="background:var(--green-bg)">🏠</div>Stanovanje</div><div class="hsub">Internet, zavarovanje, naročnine</div></div><button class="add" onclick="om('mo-hm')">+ Dodaj</button></div>`;
+  h+=`<div class="stats"><div class="stat"><div class="sl">Mesečne naročnine</div><div class="sv" style="color:var(--green)">${euro(recT)}</div></div><div class="stat"><div class="sl">Ta mesec</div><div class="sv">${euro(mT)}</div></div><div class="stat"><div class="sl">Letos</div><div class="sv">${euro(yT)}</div></div></div>`;
+  h+=`<div class="sub-l">Po kategorijah</div><div class="cards">`;
+  cats.forEach(c=>{const items=db.homeExpenses.filter(e=>e.category===c.k).sort((a,b)=>new Date(b.date)-new Date(a.date));if(!items.length)return;const tot=items.reduce((a,e)=>a+parseFloat(e.amount||0),0);const l=items[0];h+=`<div class="card"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:18px">${c.i}</span><div><div class="ctitle" style="margin-bottom:0">${c.k}</div><div style="font-size:11px;color:var(--text3)">${items.length} vnosov</div></div></div><div class="div"></div><div class="row"><span class="rl">Skupaj</span><span class="rv">${euro(tot)}</span></div><div class="row"><span class="rl">Zadnji</span><span class="rv">${euro(l.amount)}</span></div>${l.provider?`<div class="row"><span class="rl">Ponudnik</span><span style="font-size:12px;font-weight:500">${l.provider}</span></div>`:''}<div class="row"><span class="rl">Datum</span><span class="rv">${l.date}</span></div></div>`});
+  h+=`</div><div class="sub-l">Vsi vnosi</div><div class="tbl"><div class="th" style="grid-template-columns:2fr 1.5fr 1.2fr 1fr 28px"><span>Kategorija</span><span>Ponudnik</span><span>Datum</span><span>Znesek</span><span></span></div>`;
+  [...db.homeExpenses].sort((a,b)=>new Date(b.date)-new Date(a.date)).forEach(e=>{h+=`<div class="tr" style="grid-template-columns:2fr 1.5fr 1.2fr 1fr 28px"><div style="font-weight:500;font-size:13px">${e.category}</div><div style="font-size:12px;color:var(--text2)">${e.provider||''}${e.note?`<br><span style="color:var(--text3);font-size:11px">${e.note}</span>`:''}</div><div style="font-family:monospace;font-size:12px">${e.date}</div><div style="font-weight:500">${euro(e.amount)}</div><div><button class="del" onclick="delI('homeExpenses','${e.id}')">✕</button></div></div>`});
+  const tot=db.homeExpenses.reduce((a,e)=>a+parseFloat(e.amount||0),0);
+  h+=`<div class="tf">Skupaj: ${euro(tot)}</div></div>`;
+  el.innerHTML=h;
+}
+
+function rNar(){
+  const el=document.getElementById('s-narocnine');
+  const mT=db.subscriptions.filter(s=>s.freq==='Mesečno').reduce((a,s)=>a+parseFloat(s.amount||0),0);
+  const yT=db.subscriptions.filter(s=>s.freq==='Letno').reduce((a,s)=>a+parseFloat(s.amount||0),0);
+  let h=`<div class="hdr"><div><div class="htitle"><div class="hicon" style="background:var(--purple-bg)">💳</div>Naročnine</div><div class="hsub">Mesečni in letni stroški</div></div><button class="add" onclick="om('mo-sub')">+ Dodaj</button></div>`;
+  h+=`<div class="stats"><div class="stat"><div class="sl">Mesečno</div><div class="sv" style="color:var(--purple)">${euro(mT)}</div><div class="ss">${db.subscriptions.filter(s=>s.freq==='Mesečno').length} naročnin</div></div><div class="stat"><div class="sl">Letno</div><div class="sv">${euro(yT)}</div></div><div class="stat"><div class="sl">Skupaj letno</div><div class="sv">${euro(mT*12+yT)}</div><div class="ss">mes.×12+letne</div></div><div class="stat"><div class="sl">Število</div><div class="sv" style="color:var(--accent)">${db.subscriptions.length}</div></div></div>`;
+  if(!db.subscriptions.length){h+=`<div class="empty">Ni naročnin.</div>`}else{
+    h+=`<div class="sub-l">Aktivne naročnine</div><div class="cards">`;
+    db.subscriptions.forEach(s=>{h+=`<div class="card"><div style="display:flex;justify-content:space-between"><div><div class="ctitle">${s.name}</div><div class="csub">${s.cat}</div></div><button class="del" onclick="delI('subscriptions','${s.id}')">✕</button></div><div class="div"></div><div class="row"><span class="rl">Znesek</span><span style="font-family:monospace;font-size:13px;font-weight:500">${euro(s.amount)}<span style="font-size:11px;color:var(--text3)"> /${s.freq.toLowerCase()}</span></span></div>${s.day?`<div class="row"><span class="rl">Dan</span><span class="rv" style="font-family:inherit">${s.day}.</span></div>`:''}${s.date?`<div class="row"><span class="rl">Zadnje plačilo</span><span class="rv">${s.date}</span></div>`:''}</div>`});
+    h+=`</div><div class="sub-l">Seznam</div><div class="tbl"><div class="th" style="grid-template-columns:2fr 1.5fr 1fr 1fr 1fr 28px"><span>Naziv</span><span>Kategorija</span><span>Pogostost</span><span>Dan</span><span>Znesek</span><span></span></div>`;
+    [...db.subscriptions].sort((a,b)=>parseFloat(b.amount||0)-parseFloat(a.amount||0)).forEach(s=>{h+=`<div class="tr" style="grid-template-columns:2fr 1.5fr 1fr 1fr 1fr 28px"><div style="font-weight:500">${s.name}</div><div style="font-size:12px;color:var(--text2)">${s.cat}</div><div><span class="pill">${s.freq}</span></div><div style="font-family:monospace;font-size:12px">${s.day?s.day+'.':'—'}</div><div style="font-weight:500">${euro(s.amount)}</div><div><button class="del" onclick="delI('subscriptions','${s.id}')">✕</button></div></div>`});
+    h+=`<div class="tf" style="display:flex;justify-content:flex-end;gap:20px"><span style="color:var(--text2)">Mesečno: <b>${euro(mT)}</b></span><span style="color:var(--text2)">Letno: <b>${euro(yT)}</b></span></div></div>`;
+  }
+  el.innerHTML=h;
+}
+
+function rExp(){
+  const el=document.getElementById('s-strosek');
+  const m=new Date().toISOString().slice(0,7);
+  const mT=db.expenses.filter(e=>e.date&&e.date.startsWith(m)).reduce((a,e)=>a+parseFloat(e.amount||0),0);
+  const yT=db.expenses.filter(e=>e.date&&e.date.startsWith('2026')).reduce((a,e)=>a+parseFloat(e.amount||0),0);
+  const tot=db.expenses.reduce((a,e)=>a+parseFloat(e.amount||0),0);
+  let h=`<div class="hdr"><div><div class="htitle"><div class="hicon" style="background:var(--amber-bg)">🧾</div>Ostali stroški</div><div class="hsub">Izleti, darila, sprotni stroški</div></div><button class="add" onclick="om('mo-exp')">+ Dodaj</button></div>`;
+  h+=`<div class="stats"><div class="stat"><div class="sl">Ta mesec</div><div class="sv">${euro(mT)}</div></div><div class="stat"><div class="sl">Letos</div><div class="sv">${euro(yT)}</div></div><div class="stat"><div class="sl">Skupaj</div><div class="sv">${euro(tot)}</div></div><div class="stat"><div class="sl">Vnosov</div><div class="sv" style="color:var(--accent)">${db.expenses.length}</div></div></div>`;
+  h+=`<div class="tbl"><div class="th" style="grid-template-columns:2fr 2fr 1.2fr 1fr 28px"><span>Kategorija</span><span>Opis</span><span>Datum</span><span>Znesek</span><span></span></div>`;
+  const s=[...db.expenses].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  s.forEach(e=>{h+=`<div class="tr" style="grid-template-columns:2fr 2fr 1.2fr 1fr 28px"><div><span class="pill">${e.category}</span></div><div style="font-size:13px;color:var(--text2)">${e.note||'—'}</div><div style="font-family:monospace;font-size:12px">${e.date||'—'}</div><div style="font-weight:500">${euro(e.amount)}</div><div><button class="del" onclick="delI('expenses','${e.id}')">✕</button></div></div>`});
+  if(!s.length)h+=`<div class="empty">Ni vnosov.</div>`;
+  if(s.length)h+=`<div class="tf">Skupaj: ${euro(tot)}</div>`;
+  h+=`</div>`;
+  el.innerHTML=h;
+}
+
+function delI(col,id){if(!confirm('Izbrisati?'))return;db[col]=db[col].filter(x=>x.id!==id);persist();rAll()}
+function updKm(vid){const v=db.vehicles.find(x=>x.id===vid);if(!v)return;const k=prompt('Km stanje za '+v.name+':',v.km||'');if(k===null)return;v.km=k;v.kmDate=new Date().toISOString().slice(0,10);persist();rAll()}
+function saveFin(){const mo=document.getElementById('f-mo').value,sal=document.getElementById('f-sal').value;if(!mo||!sal){alert('Vnesite mesec in plačo.');return}const ex=db.finances.findIndex(f=>f.month===mo);const chk=document.getElementById('f-chk');const rev=document.getElementById('f-rev');const cc=document.getElementById('f-cc');const e={id:ex>=0?db.finances[ex].id:uid(),month:mo,salary:sal,savings:document.getElementById('f-sav').value,extra:document.getElementById('f-ext').value,checking:chk?chk.value:'',revolut:rev?rev.value:'',creditCard:cc?cc.value:'',note:document.getElementById('f-note').value};if(ex>=0)db.finances[ex]=e;else db.finances.push(e);persist();cm('mo-fin');rAll()}
+function saveV(){const n=document.getElementById('v-n').value.trim();if(!n){alert('Vnesite naziv.');return}db.vehicles.push({id:uid(),name:n,make:document.getElementById('v-mk').value,model:document.getElementById('v-mo').value,year:document.getElementById('v-yr').value,reg:document.getElementById('v-rg').value,km:document.getElementById('v-km').value,kmDate:'',fuel:document.getElementById('v-fu').value});persist();cm('mo-v');rAll()}
+function saveIns(){const vid=document.getElementById('i-v').value,to=document.getElementById('i-to').value,amt=document.getElementById('i-am').value;if(!vid||!to||!amt){alert('Izpolnite obvezna polja.');return}db.insurances.push({id:uid(),vehicleId:vid,type:document.getElementById('i-t').value,company:document.getElementById('i-co').value,paid:document.getElementById('i-pd').value,to,premium:amt,policy:document.getElementById('i-po').value});persist();cm('mo-ins');rAll()}
+function saveSvc(){const vid=document.getElementById('svc-v').value;if(!vid){alert('Izberite vozilo.');return}db.services.push({id:uid(),vehicleId:vid,date:document.getElementById('svc-d').value,type:document.getElementById('svc-t').value,price:document.getElementById('svc-p').value,km:document.getElementById('svc-km').value,nextDate:document.getElementById('svc-nd').value,note:document.getElementById('svc-no').value,parts:[]});persist();cm('mo-svc');rAll()}
+function saveHm(){const amt=document.getElementById('h-a').value;if(!amt){alert('Vnesite znesek.');return}db.homeExpenses.push({id:uid(),category:document.getElementById('h-c').value,date:document.getElementById('h-d').value,amount:amt,provider:document.getElementById('h-p').value,note:document.getElementById('h-n').value});persist();cm('mo-hm');rAll()}
+function saveSub(){const n=document.getElementById('sb-n').value.trim(),amt=document.getElementById('sb-a').value;if(!n||!amt){alert('Vnesite naziv in znesek.');return}db.subscriptions.push({id:uid(),name:n,cat:document.getElementById('sb-c').value,freq:document.getElementById('sb-f').value,amount:amt,day:document.getElementById('sb-dy').value,date:document.getElementById('sb-d').value,note:document.getElementById('sb-no').value});persist();cm('mo-sub');rAll()}
+function saveExp(){const amt=document.getElementById('e-a').value;if(!amt){alert('Vnesite znesek.');return}db.expenses.push({id:uid(),date:document.getElementById('e-d').value,category:document.getElementById('e-c').value,amount:amt,note:document.getElementById('e-n').value});persist();cm('mo-exp');rAll()}
+
+
+function saveSG(){
+  const n=document.getElementById('sg-n').value.trim();
+  const t=document.getElementById('sg-t').value;
+  if(!n||!t){alert('Vnesite naziv in cilj.');return}
+  db.savingsGoals.push({id:uid(),name:n,target:t,current:document.getElementById('sg-c').value||'0',deadline:document.getElementById('sg-d').value,icon:document.getElementById('sg-i').value||'💰',note:document.getElementById('sg-no').value});
+  persist();cm('mo-sg');rAll();
+}
+
+function updateSG(){
+  const id=document.getElementById('sgu-id').value;
+  const c=document.getElementById('sgu-c').value;
+  if(!c){alert('Vnesite znesek.');return}
+  const sg=db.savingsGoals.find(x=>x.id===id);
+  if(sg){sg.current=c;sg.lastUpdate=new Date().toISOString().slice(0,10);}
+  persist();cm('mo-sg-upd');rAll();
+}
+
+function openSGUpdate(id){
+  const sg=db.savingsGoals.find(x=>x.id===id);
+  if(!sg)return;
+  document.getElementById('sgu-id').value=id;
+  document.getElementById('sgu-n').value=sg.name;
+  document.getElementById('sgu-c').value=sg.current;
+  om('mo-sg-upd');
+}
+
+function rSavings(container){
+  if(!db.savingsGoals||!db.savingsGoals.length) return '';
+  const today=new Date();
+  let h='';
+  db.savingsGoals.forEach(sg=>{
+    const target=parseFloat(sg.target||0);
+    const current=parseFloat(sg.current||0);
+    const pct=target>0?Math.min(Math.round(current/target*100),100):0;
+    const remaining=target-current;
+    const deadline=sg.deadline?new Date(sg.deadline):null;
+    const daysLeft=deadline?Math.round((deadline-today)/864e5):null;
+    const monthsLeft=daysLeft?Math.round(daysLeft/30.5):null;
+    const monthlyNeeded=monthsLeft&&monthsLeft>0?(remaining/monthsLeft):null;
+
+    // Progress bar color
+    const barCol=pct>=100?'var(--color-text-success)':pct>=60?'var(--color-text-info)':pct>=30?'var(--color-text-warning)':'var(--color-text-danger)';
+    const barBg=pct>=100?'var(--color-background-success)':pct>=60?'var(--color-background-info)':pct>=30?'var(--color-background-warning)':'var(--color-background-danger)';
+
+    // Motivational message
+    let motiv='';
+    if(pct>=100) motiv='🎉 Cilj dosežen!';
+    else if(pct>=75) motiv='💪 Odlično, že blizu!';
+    else if(pct>=50) motiv='🔥 Na pol poti!';
+    else if(pct>=25) motiv='📈 Dober začetek!';
+    else motiv='🚀 Začenjamo!';
+
+    h+=`<div class="card" style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:28px">${sg.icon||'💰'}</span>
+          <div>
+            <div style="font-size:15px;font-weight:500">${sg.name}</div>
+            <div style="font-size:12px;color:var(--color-text-secondary)">${sg.note||''}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button onclick="openSGUpdate('${sg.id}')" style="padding:4px 10px;border-radius:var(--border-radius-md);border:.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-secondary);font-size:12px;cursor:pointer;font-family:inherit">+ Posodobi</button>
+          <button class="del" onclick="delI('savingsGoals','${sg.id}')">✕</button>
+        </div>
+      </div>
+
+      <!-- Big progress number -->
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px">
+        <div>
+          <div style="font-size:28px;font-weight:500;color:${barCol};letter-spacing:-.5px">${current.toLocaleString('sl-SI')} €</div>
+          <div style="font-size:12px;color:var(--color-text-tertiary)">od ${target.toLocaleString('sl-SI')} € cilja</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:22px;font-weight:500;color:${barCol}">${pct}%</div>
+          <div style="font-size:12px;color:var(--color-text-tertiary)">${motiv}</div>
+        </div>
+      </div>
+
+      <!-- Progress bar -->
+      <div style="height:14px;border-radius:7px;background:var(--color-background-secondary);overflow:hidden;margin-bottom:12px;position:relative">
+        <div style="height:100%;width:${pct}%;background:${barCol};border-radius:7px;transition:width .6s;position:relative">
+          ${pct>15?`<div style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:600;color:#fff">${pct}%</div>`:''}
+        </div>
+      </div>
+
+      <!-- Stats row -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+        <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 10px;text-align:center">
+          <div style="font-size:11px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px">Manjka</div>
+          <div style="font-size:14px;font-weight:500;color:var(--color-text-primary)">${remaining>0?remaining.toLocaleString('sl-SI')+' €':'✓'}</div>
+        </div>
+        <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 10px;text-align:center">
+          <div style="font-size:11px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px">Rok</div>
+          <div style="font-size:14px;font-weight:500;color:${daysLeft&&daysLeft<90?'var(--color-text-warning)':'var(--color-text-primary)'}">${daysLeft?daysLeft+' dni':'—'}</div>
+        </div>
+        <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 10px;text-align:center">
+          <div style="font-size:11px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px">Na mesec</div>
+          <div style="font-size:14px;font-weight:500;color:${monthlyNeeded&&monthlyNeeded>500?'var(--color-text-warning)':'var(--color-text-primary)'}">${monthlyNeeded?Math.ceil(monthlyNeeded)+' €':'—'}</div>
+        </div>
+      </div>
+
+      ${sg.lastUpdate?`<div style="font-size:11px;color:var(--color-text-tertiary);margin-top:8px;text-align:right">Zadnja posodobitev: ${sg.lastUpdate}</div>`:''}
+    </div>`;
+  });
+  return h;
+}
+
+init();
+
+</script>
+
+<div class="mo" id="mo-sg"><div class="md">
+  <div class="mt">Varčevalni cilj</div>
+  <div class="fg"><label>Naziv</label><input id="sg-n" placeholder="Nov avto, počitnice..."></div>
+  <div class="g2"><div class="fg"><label>Cilj (€)</label><input id="sg-t" type="number" step="0.01"></div><div class="fg"><label>Trenutno prihranjenega (€)</label><input id="sg-c" type="number" step="0.01"></div></div>
+  <div class="g2"><div class="fg"><label>Rok</label><input id="sg-d" type="date"></div><div class="fg"><label>Ikona</label><input id="sg-i" placeholder="🚗 🏠 ✈️ 💍"></div></div>
+  <div class="fg"><label>Opomba</label><input id="sg-no" placeholder="opcijsko"></div>
+  <div class="mf"><button class="bc" onclick="cm('mo-sg')">Prekliči</button><button class="bs" onclick="saveSG()">Shrani</button></div>
+</div></div>
+
+<div class="mo" id="mo-sg-upd"><div class="md">
+  <div class="mt">Posodobi prihranek</div>
+  <div class="fg"><label>Naziv cilja</label><input id="sgu-n" readonly style="opacity:.6"></div>
+  <div class="fg"><label>Novo stanje prihrankov (€)</label><input id="sgu-c" type="number" step="0.01"></div>
+  <input type="hidden" id="sgu-id">
+  <div class="mf"><button class="bc" onclick="cm('mo-sg-upd')">Prekliči</button><button class="bs" onclick="updateSG()">Posodobi</button></div>
+</div></div>
+
+</body>
+</html>
