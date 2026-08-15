@@ -83,7 +83,7 @@ footer{text-align:center;padding:2rem;font-size:12px;color:var(--text3);border-t
 <nav>
   <div class="nav-logo"><span class="dot"></span>Moj Pregled</div>
   <div class="nav-links" id="nav-tabs"></div>
-  <div class="nav-date" id="nav-date"></div>
+  <div style="display:flex;align-items:center;gap:12px"><div class="nav-date" id="nav-date"></div><button onclick="resetData()" style="padding:4px 10px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text3);font-size:11px;cursor:pointer;font-family:inherit" title="Počisti cache in naloži sveže podatke">↺ Osveži</button></div>
 </nav>
 <main>
 <div class="app" style="position:relative" id="app">
@@ -561,6 +561,15 @@ function rSavings(container){
     </div>`;
   });
   return h;
+}
+
+function resetData(){
+  if(!confirm('Počisti lokalne podatke in naloži sveže? Vnosi ki si jih dodal ročno se bodo izgubili.')) return;
+  localStorage.removeItem('mpv3');
+  db = JSON.parse(JSON.stringify(INIT));
+  persist();
+  rAll();
+  alert('Podatki osveženi!');
 }
 
 init();
