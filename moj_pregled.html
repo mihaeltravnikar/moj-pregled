@@ -564,12 +564,12 @@ function rSavings(container){
 }
 
 function resetData(){
-  if(!confirm('Počisti lokalne podatke in naloži sveže? Vnosi ki si jih dodal ročno se bodo izgubili.')) return;
+  if(!confirm('Osveži podatke iz zadnje verzije? Ročno dodani vnosi se bodo izgubili.')) return;
   localStorage.removeItem('mpv3');
   db = JSON.parse(JSON.stringify(INIT));
   persist();
   rAll();
-  alert('Podatki osveženi!');
+  alert('Podatki so osveženi!');
 }
 
 init();
