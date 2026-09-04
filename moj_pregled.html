@@ -592,7 +592,7 @@ function rBusiness(){
   const prevM=months[1];
   const revGrowth=prevM&&prevM.revenue>0?((parseFloat(lastM?.revenue||0)-parseFloat(prevM.revenue))/parseFloat(prevM.revenue)*100):0;
 
-  let h=`<div class="hdr"><div><div class="htitle"><div class="hicon" style="background:#1a2e1a">🏪</div>Business · newwaywear.shop</div><div class="hsub">WooCommerce pregled prodaje in investicij</div></div>
+  let h=`<div class="hdr"><div><div class="htitle"><div class="hicon" style="background:#1a2e1a">🏪</div>Business · newwaywear.shop</div><div class="hsub">Print on Demand · WooCommerce pregled prodaje in marketinga</div></div>
     <div style="display:flex;gap:8px">
       <button class="add" onclick="om('mo-biz-csv')" title="Uvozi WooCommerce CSV">📂 Uvozi CSV</button>
       <button class="add" onclick="om('mo-biz-inv')">+ Investicija</button>
@@ -879,9 +879,9 @@ init();
   <div class="mt">📂 Uvozi WooCommerce CSV</div>
   <div style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6">
     <strong>Kako izvoziti iz WooCommerce:</strong><br>
-    1. WooCommerce → Reports → Orders → Export CSV<br>
-    2. Ali namesti brezplačni plugin "Advanced Order Export"<br>
-    3. Izvozi za željeno obdobje
+    1. WooCommerce → <b>Reports → Orders → Export</b><br>
+    2. Ali: Namesti plugin <b>"Advanced Order Export for WooCommerce"</b> (brezplačen)<br>
+    3. Izvozi naročila za željeno obdobje (status: Completed)
   </div>
   <div class="fg"><label>Izberi CSV datoteko</label>
     <input type="file" id="biz-csv-file" accept=".csv" onchange="handleCSVUpload(event)" style="padding:8px;cursor:pointer">
@@ -901,7 +901,7 @@ init();
   <div class="mt">Dodaj investicijo</div>
   <div class="fg"><label>Opis</label><input id="bi-name" placeholder="Google Ads, blago, hosting..."></div>
   <div class="fg"><label>Kategorija</label>
-    <select id="bi-cat"><option>Oglaševanje</option><option>Blago / zaloga</option><option>Hosting & domene</option><option>Programska oprema</option><option>Pakiranje</option><option>Dostava</option><option>Drugo</option></select>
+    <select id="bi-cat"><option>Meta Ads</option><option>Google Ads</option><option>TikTok Ads</option><option>Influencer / UGC</option><option>Grafično oblikovanje</option><option>Hosting & domene</option><option>Programska oprema</option><option>Fotografija / video</option><option>Drugo</option></select>
   </div>
   <div class="g2"><div class="fg"><label>Datum</label><input id="bi-date" type="date"></div><div class="fg"><label>Znesek (€)</label><input id="bi-amt" type="number" step="0.01"></div></div>
   <div class="fg"><label>Opomba</label><input id="bi-note" placeholder="opcijsko"></div>
