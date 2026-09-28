@@ -243,143 +243,191 @@ function rFin(){
   const secs={};items.forEach(i=>{if(!secs[i.sec])secs[i.sec]=[];secs[i.sec].push(i)});
   let h=`<div class="hdr"><div><div class="htitle"><div class="hicon" style="background:var(--green-bg)">💰</div>Finance</div><div class="hsub">Plača: 15. v mesecu</div></div><button class="add" onclick="om('mo-fin');document.getElementById('f-mo').value='${_fm}'">+ Vnesi plačo</button></div>`;
 
-  // === GRAFIČNI PREGLED PO OBDOBJIH ===
-  const allFin=[...db.finances].filter(f=>f.salary).sort((a,b)=>a.month.localeCompare(b.month));
-  const now=new Date();
-  const curMo=now.toISOString().slice(0,7);
+  // === KOMBINIRANI FINANČNI GRAFIKON ===
+  (function(){
+    const allFin=[...db.finances].filter(f=>f.salary).sort((a,b)=>a.month.localeCompare(b.month));
+    const now=new Date();
 
-  function getMonthsBack(n){
-    const res=[];
-    for(let i=n-1;i>=0;i--){
-      const d=new Date(now.getFullYear(),now.getMonth()-i,1);
-      res.push(d.toISOString().slice(0,7));
+    function getSlice(n){
+      // build last N calendar months
+      const months=[];
+      for(let i=n-1;i>=0;i--){
+        const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+        months.push(d.toISOString().slice(0,7));
+      }
+      return months.map(m=>{
+        const f=allFin.find(x=>x.month===m);
+        if(!f)return null;
+        const inc=parseFloat(f.salary||0)+parseFloat(f.extra||0);
+        const sav=parseFloat(f.savedThisMonth||0);
+        const check=parseFloat(f.checking||0);
+        const rev=parseFloat(f.revolut||0);
+        const cc=parseFloat(f.creditCard||0);
+        const rem=Math.max(check+rev-cc,0);
+        const out=Math.max(inc-sav-rem,0);
+        const lbl=MN[parseInt(m.slice(5,7))-1].slice(0,3);
+        return{m,label:lbl,inc,out,sav,rem,extra:parseFloat(f.extra||0)};
+      }).filter(Boolean);
     }
-    return res;
-  }
 
-  function buildPeriodChart(months){
-    const data=months.map(m=>{
-      const f=allFin.find(x=>x.month===m);
-      if(!f)return null;
-      const inc=parseFloat(f.salary||0)+parseFloat(f.extra||0);
-      const sav=parseFloat(f.savedThisMonth||0);
-      // odhodki = vse kar ni preostanek ali varčevanje
-      // ker ne sledimo točno, izračunamo iz checking+revolut-creditCard
-      const check=parseFloat(f.checking||0);
-      const rev=parseFloat(f.revolut||0);
-      const cc=parseFloat(f.creditCard||0);
-      const remain=Math.max(check+rev-cc,0);
-      const out=Math.max(inc-sav-remain,0);
-      return{m,inc,sav,out,remain,label:MN[parseInt(m.slice(5,7))-1].slice(0,3)+" '"+m.slice(2,4)};
-    }).filter(Boolean);
-    return data;
-  }
+    function eu(v){return Math.round(v).toLocaleString('sl-SI')+' €';}
 
-  const periods=[
-    {id:'p1m',label:'1M',months:getMonthsBack(1)},
-    {id:'p3m',label:'3M',months:getMonthsBack(3)},
-    {id:'p6m',label:'6M',months:getMonthsBack(6)},
-    {id:'p1y',label:'1L',months:getMonthsBack(12)},
-  ];
+    function renderTiles(slice,el){
+      const t=slice.reduce((a,d)=>({inc:a.inc+d.inc,out:a.out+d.out,sav:a.sav+d.sav,rem:a.rem+d.rem}),{inc:0,out:0,sav:0,rem:0});
+      el.innerHTML=`
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:9px 10px 8px;text-align:center">
+          <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:3px">Prihodki</div>
+          <div style="font-family:monospace;font-size:15px;font-weight:500;color:var(--text)">${eu(t.inc)}</div>
+        </div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:9px 10px 8px;text-align:center">
+          <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:3px">Odhodki</div>
+          <div style="font-family:monospace;font-size:15px;font-weight:500;color:var(--red)">${eu(t.out)}</div>
+        </div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:9px 10px 8px;text-align:center">
+          <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:3px">Varčevanje</div>
+          <div style="font-family:monospace;font-size:15px;font-weight:500;color:var(--accent)">${eu(t.sav)}</div>
+        </div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:9px 10px 8px;text-align:center">
+          <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:3px">Preostanek</div>
+          <div style="font-family:monospace;font-size:15px;font-weight:500;color:var(--green)">${eu(t.rem)}</div>
+        </div>`;
+    }
 
-  function renderPeriodChart(pid){
-    const p=periods.find(x=>x.id===pid);
-    const data=buildPeriodChart(p.months);
-    if(!data.length)return`<div style="text-align:center;color:var(--text3);padding:2rem;font-size:13px">Ni podatkov za to obdobje.</div>`;
+    function drawChart(slice,svgEl){
+      const W=svgEl.parentElement.offsetWidth||600;
+      const padL=44,padR=14,padT=54,padB=34;
+      const lineH=44,barH=112,sep=14;
+      const innerW=W-padL-padR;
+      const H=padT+lineH+sep+barH+padB;
+      const maxInc=Math.max(...slice.map(d=>d.inc),1);
+      const maxBar=Math.max(...slice.map(d=>d.out+d.sav+Math.max(d.rem,0)),1);
+      const n=slice.length;
+      const groupW=innerW/n;
+      const barW=Math.min(groupW*0.52,44);
+      const r=4;
 
-    // Totals for summary row
-    const totIn=data.reduce((a,d)=>a+d.inc,0);
-    const totOut=data.reduce((a,d)=>a+d.out,0);
-    const totSav=data.reduce((a,d)=>a+d.sav,0);
-    const totRem=data.reduce((a,d)=>a+d.remain,0);
+      // grid
+      let g='',yl='';
+      const step=Math.ceil(maxBar/4/100)*100||500;
+      for(let v=0;v<=maxBar*1.08;v+=step){
+        const y=padT+lineH+sep+barH-(v/maxBar)*barH;
+        if(y<padT+lineH+sep)break;
+        g+=`<line x1="${padL}" x2="${W-padR}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,.04)" stroke-width="1"/>`;
+        const lbl=v>=1000?(v/1000).toFixed(v%1000===0?0:1)+'k':v;
+        yl+=`<text x="${padL-5}" y="${(y+4).toFixed(1)}" text-anchor="end" fill="#4a4f5a" font-size="9" font-family="monospace">${lbl}€</text>`;
+      }
 
-    const maxVal=Math.max(...data.map(d=>d.inc),1);
-    const W=100; // % based
-    const barH=44;
-    const gap=data.length>4?8:14;
-    const barW=Math.floor((W-gap*(data.length-1))/data.length);
+      // bars + line
+      let bars='',lpts=[],hits='';
+      const aBase=padT+lineH;
+      slice.forEach((d,i)=>{
+        const cx=padL+i*groupW+groupW/2;
+        const bx=cx-barW/2;
+        const yBase=padT+lineH+sep+barH;
+        const sc=v=>(Math.min(v,maxBar)/maxBar)*barH;
+        const hO=sc(d.out),hS=sc(d.sav),hR=sc(Math.max(d.rem,0));
+        if(hO>0.5)bars+=`<rect x="${bx.toFixed(1)}" y="${(yBase-hO).toFixed(1)}" width="${barW}" height="${hO.toFixed(1)}" fill="#e85555" opacity=".82" rx="${Math.min(r,hO/2).toFixed(1)}"/>`;
+        if(hS>0.5)bars+=`<rect x="${bx.toFixed(1)}" y="${(yBase-hO-hS).toFixed(1)}" width="${barW}" height="${hS.toFixed(1)}" fill="#4f8ef7" opacity=".88" rx="${Math.min(r,hS/2).toFixed(1)}"/>`;
+        if(hR>0.5)bars+=`<rect x="${bx.toFixed(1)}" y="${(yBase-hO-hS-hR).toFixed(1)}" width="${barW}" height="${hR.toFixed(1)}" fill="#34c98a" opacity=".88" rx="${Math.min(r,hR/2).toFixed(1)}"/>`;
+        bars+=`<text x="${cx.toFixed(1)}" y="${(H-padB+15).toFixed(1)}" text-anchor="middle" fill="#4a4f5a" font-size="10.5">${d.label}</text>`;
+        if(d.extra>0)bars+=`<text x="${cx.toFixed(1)}" y="${(H-padB+26).toFixed(1)}" text-anchor="middle" fill="#f0a030" font-size="8.5" font-style="italic">+reg.</text>`;
+        const ly=padT+lineH-(d.inc/maxInc)*(lineH-6);
+        lpts.push({x:cx,y:ly,inc:d.inc});
+        hits+=`<rect x="${(padL+i*groupW).toFixed(1)}" y="${padT}" width="${groupW.toFixed(1)}" height="${(lineH+sep+barH+10).toFixed(1)}" fill="transparent" onmouseenter="finTip(event,${i})" onmouseleave="finTipOff()"/>`;
+      });
 
-    // Build SVG bars
-    let bars='';
-    data.forEach((d,i)=>{
-      const x=i*(barW+gap);
-      const scale=v=>Math.round((v/maxVal)*barH*10)/10;
-      const hIn=scale(d.inc);
-      const hOut=scale(d.out);
-      const hSav=scale(d.sav);
-      const hRem=Math.max(hIn-hOut-hSav,0);
+      const poly=lpts.map(p=>`${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+      const area=`${lpts[0].x.toFixed(1)},${aBase} `+poly+` ${lpts[lpts.length-1].x.toFixed(1)},${aBase}`;
+      const lineSvg=`<defs><linearGradient id="fcg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(240,240,240,.1)"/><stop offset="100%" stop-color="rgba(240,240,240,.01)"/></linearGradient></defs>
+        <polygon points="${area}" fill="url(#fcg)"/>
+        <polyline points="${poly}" fill="none" stroke="rgba(240,240,240,.38)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+        ${lpts.map(p=>`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3.5" fill="var(--bg2)" stroke="rgba(240,240,240,.5)" stroke-width="1.8"/>
+        <text x="${p.x.toFixed(1)}" y="${(p.y-9).toFixed(1)}" text-anchor="middle" fill="rgba(240,240,240,.55)" font-size="9.5" font-family="monospace">${eu(p.inc)}</text>`).join('')}`;
+      const sepLine=`<line x1="${padL}" x2="${W-padR}" y1="${(padT+lineH+sep/2).toFixed(1)}" y2="${(padT+lineH+sep/2).toFixed(1)}" stroke="rgba(255,255,255,.055)" stroke-width="1" stroke-dasharray="3 4"/>`;
 
-      // Stacked bar: odhodki(red) + varčevanje(blue) + preostanek(green)
-      let y=barH;
-      const segs=[];
-      if(hOut>0){y-=hOut;segs.push(`<rect x="${x}" y="${y}" width="${barW}" height="${hOut}" fill="var(--red)" rx="2" opacity=".85"/>`);}
-      if(hSav>0){y-=hSav;segs.push(`<rect x="${x}" y="${y}" width="${barW}" height="${hSav}" fill="var(--accent)" rx="2" opacity=".9"/>`);}
-      if(hRem>0){y-=hRem;segs.push(`<rect x="${x}" y="${y}" width="${barW}" height="${hRem}" fill="var(--green)" rx="2" opacity=".9"/>`);}
+      svgEl.setAttribute('viewBox',`0 0 ${W} ${H}`);
+      svgEl.style.height=H+'px';
+      svgEl.innerHTML=g+yl+lineSvg+sepLine+bars+hits;
+      window._fcs=slice;window._fcg={padL,padT,groupW,lineH,sep,barH,W,H};
+    }
 
-      bars+=`<g>
-        ${segs.join('')}
-        <text x="${x+barW/2}" y="${barH+11}" text-anchor="middle" style="font-size:9px;fill:var(--text3)">${d.label}</text>
-        <text x="${x+barW/2}" y="${barH+21}" text-anchor="middle" style="font-size:8px;fill:var(--text2)">${Math.round(d.inc)}€</text>
-      </g>`;
-    });
+    window.finTip=function(e,i){
+      const d=window._fcs[i];const g=window._fcg;
+      const tip=document.getElementById('fc-tip');
+      const wrap=tip.parentElement;
+      const wRect=wrap.getBoundingClientRect();
+      const cx=g.padL+i*g.groupW+g.groupW/2;
+      tip.innerHTML=`<div style="font-weight:600;margin-bottom:6px;font-size:12px">${d.label} ${d.m.slice(0,4)}${d.extra?` <span style="color:#f0a030;font-size:10px;font-weight:400">+${Math.round(d.extra).toLocaleString('sl-SI')}€ reg.</span>`:''}</div>
+        <div style="display:flex;justify-content:space-between;gap:18px;padding:1px 0"><span style="color:#4a4f5a">Prihodki</span><span style="font-family:monospace;color:#f0f0f0">${eu(d.inc)}</span></div>
+        <div style="display:flex;justify-content:space-between;gap:18px;padding:1px 0"><span style="color:#4a4f5a">Odhodki</span><span style="font-family:monospace;color:#e85555">${eu(d.out)}</span></div>
+        <div style="display:flex;justify-content:space-between;gap:18px;padding:1px 0"><span style="color:#4a4f5a">Varčevanje</span><span style="font-family:monospace;color:#4f8ef7">${eu(d.sav)}</span></div>
+        <div style="display:flex;justify-content:space-between;gap:18px;padding:1px 0"><span style="color:#4a4f5a">Preostanek</span><span style="font-family:monospace;color:#34c98a">${eu(d.rem)}</span></div>`;
+      tip.style.opacity='1';
+      const tipH=tip.offsetHeight||104;
+      const yMid=g.padT+g.lineH+g.sep+g.barH/2;
+      let left=cx-91;left=Math.max(0,Math.min(left,wRect.width-182));
+      tip.style.left=left+'px';tip.style.top=(yMid-tipH/2)+'px';
+    };
+    window.finTipOff=function(){document.getElementById('fc-tip').style.opacity='0';};
 
-    const svgW=data.length*(barW+gap);
+    const PLBL={1:'Zadnji mesec',3:'Zadnji 3 meseci',6:'Zadnjih 6 mesecev',12:'Zadnje leto'};
+    let _ap=3;
 
-    return`
-    <svg viewBox="0 0 ${svgW} ${barH+26}" style="width:100%;max-height:120px;overflow:visible">
-      ${bars}
-    </svg>
-    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;font-size:11px">
-      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--red);display:inline-block"></span> Odhodki <strong>${Math.round(totOut)} €</strong></span>
-      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--accent);display:inline-block"></span> Varčevanje <strong>${Math.round(totSav)} €</strong></span>
-      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--green);display:inline-block"></span> Preostanek <strong>${Math.round(totRem)} €</strong></span>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px">
-      <div style="text-align:center;background:var(--bg3);border-radius:var(--r-sm);padding:6px 4px">
-        <div style="font-size:10px;color:var(--text3);margin-bottom:2px">PRIHODKI</div>
-        <div style="font-size:15px;font-weight:600;color:var(--text)">${Math.round(totIn)} €</div>
+    function fcRender(n){
+      _ap=n;
+      const slice=getSlice(n);
+      document.getElementById('fc-sub').textContent=PLBL[n]||'';
+      document.querySelectorAll('.fc-tab').forEach(b=>b.classList.toggle('fc-on',parseInt(b.dataset.p)===n));
+      renderTiles(slice,document.getElementById('fc-tiles'));
+      drawChart(slice,document.getElementById('fc-svg'));
+    }
+
+    h+=`<div class="card" style="margin-bottom:1.25rem">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+        <div>
+          <div style="font-size:14px;font-weight:600">Finančni pregled</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:1px" id="fc-sub">Zadnji 3 meseci</div>
+        </div>
+        <div style="display:flex;gap:3px;background:var(--bg3);border-radius:9px;padding:3px">
+          <button class="fc-tab fc-on" data-p="1" onclick="fcSwitch(1)" style="padding:4px 13px;border-radius:7px;border:none;background:none;color:var(--text3);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .18s">1M</button>
+          <button class="fc-tab" data-p="3" onclick="fcSwitch(3)" style="padding:4px 13px;border-radius:7px;border:none;background:none;color:var(--text3);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .18s">3M</button>
+          <button class="fc-tab" data-p="6" onclick="fcSwitch(6)" style="padding:4px 13px;border-radius:7px;border:none;background:none;color:var(--text3);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .18s">6M</button>
+          <button class="fc-tab" data-p="12" onclick="fcSwitch(12)" style="padding:4px 13px;border-radius:7px;border:none;background:none;color:var(--text3);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .18s">1L</button>
+        </div>
       </div>
-      <div style="text-align:center;background:var(--red-bg);border-radius:var(--r-sm);padding:6px 4px">
-        <div style="font-size:10px;color:var(--text3);margin-bottom:2px">ODHODKI</div>
-        <div style="font-size:15px;font-weight:600;color:var(--red)">${Math.round(totOut)} €</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:16px" id="fc-tiles"></div>
+      <div style="position:relative">
+        <svg id="fc-svg" style="width:100%;display:block;overflow:visible"></svg>
+        <div id="fc-tip" style="position:absolute;background:var(--bg4);border:1px solid var(--border2);border-radius:9px;padding:9px 13px;font-size:11px;pointer-events:none;opacity:0;transition:opacity .12s;white-space:nowrap;z-index:20;box-shadow:0 4px 16px rgba(0,0,0,.4)"></div>
       </div>
-      <div style="text-align:center;background:var(--blue-bg);border-radius:var(--r-sm);padding:6px 4px">
-        <div style="font-size:10px;color:var(--text3);margin-bottom:2px">VARČEVANJE</div>
-        <div style="font-size:15px;font-weight:600;color:var(--accent)">${Math.round(totSav)} €</div>
-      </div>
-      <div style="text-align:center;background:var(--green-bg);border-radius:var(--r-sm);padding:6px 4px">
-        <div style="font-size:10px;color:var(--text3);margin-bottom:2px">PREOSTANEK</div>
-        <div style="font-size:15px;font-weight:600;color:var(--green)">${Math.round(totRem)} €</div>
+      <div style="display:flex;gap:14px;margin-top:12px;flex-wrap:wrap;justify-content:center">
+        <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3)"><span style="width:18px;height:2px;border-radius:1px;background:rgba(240,240,240,.4);display:inline-block"></span>Prihodki</span>
+        <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3)"><span style="width:9px;height:9px;border-radius:2px;background:#e85555;opacity:.82;display:inline-block"></span>Odhodki</span>
+        <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3)"><span style="width:9px;height:9px;border-radius:2px;background:#4f8ef7;opacity:.88;display:inline-block"></span>Varčevanje</span>
+        <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3)"><span style="width:9px;height:9px;border-radius:2px;background:#34c98a;opacity:.88;display:inline-block"></span>Preostanek</span>
       </div>
     </div>`;
-  }
 
-  let _activePeriod='p3m';
-  h+=`<div class="card" style="margin-bottom:1.25rem">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-      <div style="font-size:13px;font-weight:500">Grafični pregled</div>
-      <div style="display:flex;gap:4px" id="period-tabs">
-        ${periods.map(p=>`<button onclick="switchPeriod('${p.id}')" id="ptab-${p.id}" style="padding:3px 10px;border-radius:5px;border:1px solid var(--border2);background:${p.id==='p3m'?'var(--bg4)':'none'};color:${p.id==='p3m'?'var(--text)':'var(--text3)'};font-size:12px;cursor:pointer;font-family:inherit;font-weight:${p.id==='p3m'?'500':'400'};transition:all .15s">${p.label}</button>`).join('')}
-      </div>
-    </div>
-    <div id="period-chart-area">${renderPeriodChart('p3m')}</div>
-  </div>`;
-
-  // Register switchPeriod globally
-  if(!window._periodChartInit){
-    window._periodChartInit=true;
-    window.switchPeriod=function(pid){
-      periods.forEach(p=>{
-        const btn=document.getElementById('ptab-'+p.id);
-        if(!btn)return;
-        if(p.id===pid){btn.style.background='var(--bg4)';btn.style.color='var(--text)';btn.style.fontWeight='500';}
-        else{btn.style.background='none';btn.style.color='var(--text3)';btn.style.fontWeight='400';}
+    window.fcSwitch=function(n){
+      document.querySelectorAll('.fc-tab').forEach(b=>{
+        const on=parseInt(b.dataset.p)===n;
+        b.style.background=on?'var(--bg4)':'none';
+        b.style.color=on?'var(--text)':'var(--text3)';
+        b.style.boxShadow=on?'0 1px 4px rgba(0,0,0,.3)':'none';
+        b.classList.toggle('fc-on',on);
       });
-      document.getElementById('period-chart-area').innerHTML=renderPeriodChart(pid);
+      fcRender(n);
     };
-  }
 
-  // Line chart varčevanja skozi mesece
+    // init after DOM
+    setTimeout(()=>{
+      fcSwitch(3);
+      window.addEventListener('resize',()=>fcRender(_ap));
+    },0);
+  })();
+
+  
+    // Line chart varčevanja skozi mesece
   const finSorted2=[...db.finances].filter(f=>f.salary).sort((a,b)=>a.month.localeCompare(b.month));
   if(finSorted2.length>1){
     const W=500,H=80,pad=12;
