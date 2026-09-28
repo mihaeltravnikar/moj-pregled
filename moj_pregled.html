@@ -671,8 +671,8 @@ function rSavings(container){
     const monthlyNeeded=monthsLeft&&monthsLeft>0?(remaining/monthsLeft):null;
 
     // Progress bar color
-    const barCol=pct>=100?'var(--color-text-success)':pct>=60?'var(--color-text-info)':pct>=30?'var(--color-text-warning)':'var(--color-text-danger)';
-    const barBg=pct>=100?'var(--color-background-success)':pct>=60?'var(--color-background-info)':pct>=30?'var(--color-background-warning)':'var(--color-background-danger)';
+    const barCol=pct>=100?'var(--green)':pct>=60?'var(--blue)':pct>=30?'var(--amber)':'var(--red)';
+    const barBg=pct>=100?'var(--green-bg)':pct>=60?'var(--blue-bg)':pct>=30?'var(--amber-bg)':'var(--red-bg)';
 
     // Motivational message
     let motiv='';
@@ -683,56 +683,54 @@ function rSavings(container){
     else motiv='🚀 Začenjamo!';
 
     h+=`<div class="card" style="margin-bottom:10px">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
         <div style="display:flex;align-items:center;gap:10px">
           <span style="font-size:28px">${sg.icon||'💰'}</span>
           <div>
-            <div style="font-size:15px;font-weight:500">${sg.name}</div>
-            <div style="font-size:12px;color:var(--color-text-secondary)">${sg.note||''}</div>
+            <div style="font-size:16px;font-weight:700;letter-spacing:-.02em;color:var(--text)">${sg.name}</div>
+            <div style="font-size:12px;color:var(--text2);margin-top:2px">${deadline?'Cilj do konca '+sg.deadline.slice(0,4):sg.note||''}</div>
           </div>
         </div>
         <div style="display:flex;gap:6px">
-          <button onclick="openSGUpdate('${sg.id}')" style="padding:4px 10px;border-radius:var(--border-radius-md);border:.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-secondary);font-size:12px;cursor:pointer;font-family:inherit">+ Posodobi</button>
+          <button onclick="openSGUpdate('${sg.id}')" style="padding:5px 12px;border-radius:var(--r-sm);border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s">+ Posodobi</button>
           <button class="del" onclick="delI('savingsGoals','${sg.id}')">✕</button>
         </div>
       </div>
 
       <!-- Big progress number -->
-      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:10px">
         <div>
-          <div style="font-size:28px;font-weight:500;color:${barCol};letter-spacing:-.5px">${current.toLocaleString('sl-SI')} €</div>
-          <div style="font-size:12px;color:var(--color-text-tertiary)">od ${target.toLocaleString('sl-SI')} € cilja</div>
+          <div style="font-size:32px;font-weight:700;color:${barCol};letter-spacing:-.04em;line-height:1">${current.toLocaleString('sl-SI')} €</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:4px">od ${target.toLocaleString('sl-SI')} € cilja</div>
         </div>
         <div style="text-align:right">
-          <div style="font-size:22px;font-weight:500;color:${barCol}">${pct}%</div>
-          <div style="font-size:12px;color:var(--color-text-tertiary)">${motiv}</div>
+          <div style="font-size:26px;font-weight:700;color:${barCol};letter-spacing:-.03em;line-height:1">${pct}%</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:4px">${motiv}</div>
         </div>
       </div>
 
       <!-- Progress bar -->
-      <div style="height:14px;border-radius:7px;background:var(--color-background-secondary);overflow:hidden;margin-bottom:12px;position:relative">
-        <div style="height:100%;width:${pct}%;background:${barCol};border-radius:7px;transition:width .6s;position:relative">
-          ${pct>15?`<div style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:600;color:#fff">${pct}%</div>`:''}
-        </div>
+      <div style="height:10px;border-radius:5px;background:var(--bg3);overflow:hidden;margin-bottom:14px;border:1px solid var(--border2)">
+        <div style="height:100%;width:${pct}%;background:${barCol};border-radius:5px;transition:width .6s"></div>
       </div>
 
       <!-- Stats row -->
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
-        <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 10px;text-align:center">
-          <div style="font-size:11px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px">Manjka</div>
-          <div style="font-size:14px;font-weight:500;color:var(--color-text-primary)">${remaining>0?remaining.toLocaleString('sl-SI')+' €':'✓'}</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px">
+        <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r-sm);padding:10px 12px;text-align:center">
+          <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px">Manjka</div>
+          <div style="font-size:15px;font-weight:700;color:var(--text);letter-spacing:-.02em">${remaining>0?remaining.toLocaleString('sl-SI')+' €':'✓'}</div>
         </div>
-        <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 10px;text-align:center">
-          <div style="font-size:11px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px">Rok</div>
-          <div style="font-size:14px;font-weight:500;color:${daysLeft&&daysLeft<90?'var(--color-text-warning)':'var(--color-text-primary)'}">${daysLeft?daysLeft+' dni':'—'}</div>
+        <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r-sm);padding:10px 12px;text-align:center">
+          <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px">Rok</div>
+          <div style="font-size:15px;font-weight:700;color:${daysLeft&&daysLeft<90?'var(--amber)':'var(--text)'};letter-spacing:-.02em">${daysLeft?daysLeft+' dni':'—'}</div>
         </div>
-        <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 10px;text-align:center">
-          <div style="font-size:11px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px">Na mesec</div>
-          <div style="font-size:14px;font-weight:500;color:${monthlyNeeded&&monthlyNeeded>500?'var(--color-text-warning)':'var(--color-text-primary)'}">${monthlyNeeded?Math.ceil(monthlyNeeded)+' €':'—'}</div>
+        <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r-sm);padding:10px 12px;text-align:center">
+          <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px">Na mesec</div>
+          <div style="font-size:15px;font-weight:700;color:${monthlyNeeded&&monthlyNeeded>500?'var(--amber)':'var(--text)'};letter-spacing:-.02em">${monthlyNeeded?Math.ceil(monthlyNeeded)+' €':'—'}</div>
         </div>
       </div>
 
-      ${sg.lastUpdate?`<div style="font-size:11px;color:var(--color-text-tertiary);margin-top:8px;text-align:right">Zadnja posodobitev: ${sg.lastUpdate}</div>`:''}
+      ${sg.lastUpdate?`<div style="font-size:11px;color:var(--text3);margin-top:8px;text-align:right">Zadnja posodobitev: ${sg.lastUpdate}</div>`:''}
 
       ${(()=>{
         const deps=sg.deposits||[];
@@ -750,33 +748,36 @@ function rSavings(container){
           return`${x},${y}`;
         }).join(' ');
         const areaPoints=`${pad},${H-pad} `+points+` ${W-pad},${H-pad}`;
-        const chartSvg=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:70px;margin:10px 0 4px">
+        const chartSvg=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:70px;margin:14px 0 6px;overflow:visible">
           <defs><linearGradient id="sg-grad-${sg.id}" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="${barCol}" stop-opacity="0.3"/>
+            <stop offset="0%" stop-color="${barCol}" stop-opacity="0.28"/>
             <stop offset="100%" stop-color="${barCol}" stop-opacity="0.02"/>
           </linearGradient></defs>
           <polygon points="${areaPoints}" fill="url(#sg-grad-${sg.id})"/>
-          <polyline points="${points}" fill="none" stroke="${barCol}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <polyline points="${points}" fill="none" stroke="${barCol}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
           ${cumulative.map((v,i)=>{
             const x=pad+(i/(Math.max(cumulative.length-1,1)))*(W-2*pad);
             const y=H-pad-(v/maxCum)*(H-2*pad);
-            return`<circle cx="${x}" cy="${y}" r="3.5" fill="${barCol}"/>
+            return`<circle cx="${x}" cy="${y}" r="4" fill="${barCol}" stroke="#0c0d0f" stroke-width="1.5"/>
             <title>${deps[i].date}: +${deps[i].amount}€ (skupaj ${v}€)</title>`;
           }).join('')}
         </svg>`;
 
         // Historia table
-        const histTable=`<div style="margin-top:10px">
-          <div style="font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Zgodovina vplačil</div>
-          ${deps.slice().reverse().map(d=>`
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:.5px solid var(--color-border-tertiary);font-size:12px">
-            <div style="color:var(--color-text-secondary)">${d.date}</div>
-            <div style="color:var(--color-text-secondary)">${d.note||''}</div>
-            <div style="font-weight:500;color:var(--color-text-success);font-family:var(--font-mono)">+${parseFloat(d.amount).toFixed(2)} €</div>
-          </div>`).join('')}
-          <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:12px;font-weight:500">
-            <span style="color:var(--color-text-secondary)">Skupaj vplačano</span>
-            <span style="font-family:var(--font-mono);color:${barCol}">${current.toLocaleString('sl-SI')} €</span>
+        const histTable=`<div style="margin-top:4px;border-top:1px solid var(--border2);padding-top:12px">
+          <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Zgodovina vplačil</div>
+          ${deps.slice().reverse().map(d=>{
+            const amt=parseFloat(d.amount);
+            const isNeg=amt<0;
+            return`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:13px">
+              <div style="color:var(--text3);font-variant-numeric:tabular-nums">${d.date}</div>
+              <div style="color:var(--text2);flex:1;padding:0 12px">${d.note||''}</div>
+              <div style="font-weight:600;color:${isNeg?'var(--red)':'var(--green)'};font-variant-numeric:tabular-nums">${isNeg?'':'+'}${amt.toFixed(2)} €</div>
+            </div>`;
+          }).join('')}
+          <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:13px;font-weight:700">
+            <span style="color:var(--text2)">Skupaj vplačano</span>
+            <span style="font-variant-numeric:tabular-nums;color:${barCol}">${current.toLocaleString('sl-SI')} €</span>
           </div>
         </div>`;
 
