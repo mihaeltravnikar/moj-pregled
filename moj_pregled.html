@@ -269,12 +269,12 @@ function rFin(){
   const rc=[{c:'Internet & TV',i:'📡'},{c:'Naročnina (tiskalnik)',i:'🖨️'},{c:'Netflix',i:'🎬'},{c:'Spotify',i:'🎵'},{c:'RTV prispevek',i:'📺'}];
   rc.forEach(r=>{const last=db.homeExpenses.filter(e=>e.category===r.c).sort((a,b)=>new Date(b.date)-new Date(a.date))[0];if(last)items.push({label:r.c,i:r.i,amt:parseFloat(last.amount||0),sec:'Stanovanje',day:null,tip:'mesečno'})});
   if(mo>=4&&mo<=10){const last=db.homeExpenses.filter(e=>e.category==='Zavarovanje stanovanja').sort((a,b)=>new Date(b.date)-new Date(a.date))[0];if(last)items.push({label:'Zavarovanje stanovanja',i:'🛡️',amt:parseFloat(last.amount||0),sec:'Stanovanje',day:null,tip:'sezonsko',note:'obrok '+(mo-3)+'/7'})}
-  db.subscriptions.filter(s=>s.freq==='Mesečno').forEach(s=>{items.push({label:s.name,i:'💳',amt:parseFloat(s.amount||0),sec:'Naročnine',day:parseInt(s.day)||null,tip:'mesečno'})});
-  db.subscriptions.filter(s=>s.freq==='Letno'&&s.date).forEach(s=>{if(parseInt(s.date.slice(5,7))===mo)items.push({label:s.name+' (letno)',i:'💳',amt:parseFloat(s.amount||0),sec:'Naročnine',day:parseInt(s.day)||null,tip:'letno'})});
+  db.subscriptions.filter(s=>s.freq==='Mesečno').forEach(s=>{const si=subIcon(s);items.push({label:s.name,i:si.i,iCol:si.col,amt:parseFloat(s.amount||0),sec:'Naročnine',day:parseInt(s.day)||null,tip:'mesečno'})});
+  db.subscriptions.filter(s=>s.freq==='Letno'&&s.date).forEach(s=>{if(parseInt(s.date.slice(5,7))===mo){const si=subIcon(s);items.push({label:s.name+' (letno)',i:si.i,iCol:si.col,amt:parseFloat(s.amount||0),sec:'Naročnine',day:parseInt(s.day)||null,tip:'letno'})}});
   db.insurances.forEach(i=>{const tMo=i.to?parseInt(i.to.slice(5,7)):null,tYr=i.to?parseInt(i.to.slice(0,4)):null;if(tMo===mo&&tYr===yr){const v=db.vehicles.find(x=>x.id===i.vehicleId);items.push({label:'Zavarovanje '+(v?v.reg:''),i:'🚗',amt:parseFloat(i.premium||0),sec:'Vozni park',day:null,tip:'letno',note:'podaljšanje'})}});
   // Kreditna kartica - prikaži če ima dolg
   const feCc=parseFloat(fe&&fe.creditCard||0);
-  if(feCc>0) items.push({label:'Kreditna kartica',i:'💳',amt:feCc,sec:'Ostalo',day:null,tip:'enkratno',note:'poplačilo'});
+  if(feCc>0) items.push({label:'Kreditna kartica',i:'💳',iCol:'#f05555',amt:feCc,sec:'Ostalo',day:null,tip:'enkratno',note:'poplačilo'});
   db.services.forEach(s=>{if(!s.nextDate)return;const nMo=parseInt(s.nextDate.slice(5,7)),nYr=parseInt(s.nextDate.slice(0,4));if(nMo===mo&&nYr===yr){const v=db.vehicles.find(x=>x.id===s.vehicleId);items.push({label:'Servis '+(v?v.reg:''),i:'🔧',amt:parseFloat(s.price||0),sec:'Vozni park',day:s.date?parseInt(s.date.slice(8)):null,tip:'servis',note:s.price?'zadnji: '+euro(s.price):'cena ni znana'})}});
   const totalOut=items.reduce((a,i)=>a+i.amt,0);
   const savedThisMonth=parseFloat(fe&&fe.savedThisMonth||0);
@@ -516,7 +516,8 @@ function rFin(){
     h+=`<div class="tbl" style="margin-bottom:1rem"><div class="th" style="grid-template-columns:2.5fr .8fr .8fr 1.1fr"><span>Postavka</span><span>Tip</span><span>Dan</span><span style="text-align:right">Znesek</span></div>`;
     si.sort((a,b)=>(a.day||99)-(b.day||99)).forEach(i=>{
       const tc=i.tip!=='mesečno'?'color:var(--'+(i.tip==='letno'?'accent':i.tip==='sezonsko'?'green':'amber')+')':'';
-      h+=`<div class="tr" style="grid-template-columns:2.5fr .8fr .8fr 1.1fr"><div><span style="font-size:14px;margin-right:6px">${i.i}</span><span style="font-weight:500">${i.label}</span>${i.note?`<span style="font-size:11px;color:var(--text3);margin-left:5px">${i.note}</span>`:''}</div><div><span class="pill" style="${tc}">${i.tip}</span></div><div style="font-family:monospace;font-size:12px;color:var(--text2)">${i.day?i.day+'.':'—'}</div><div style="font-weight:500;text-align:right;font-family:monospace">${i.amt>0?euro(i.amt):'?'}</div></div>`;
+      const iconStyle=i.iCol?`font-size:14px;margin-right:6px;filter:drop-shadow(0 0 3px ${i.iCol}44)`:'font-size:14px;margin-right:6px';
+      h+=`<div class="tr" style="grid-template-columns:2.5fr .8fr .8fr 1.1fr"><div><span style="${iconStyle}">${i.i}</span><span style="font-weight:500">${i.label}</span>${i.note?`<span style="font-size:11px;color:var(--text3);margin-left:5px">${i.note}</span>`:''}</div><div><span class="pill" style="${tc}">${i.tip}</span></div><div style="font-family:monospace;font-size:12px;color:var(--text2)">${i.day?i.day+'.':'—'}</div><div style="font-weight:500;text-align:right;font-variant-numeric:tabular-nums;color:${i.iCol||'var(--text)'}">${i.amt>0?euro(i.amt):'?'}</div></div>`;
     });
     h+=`<div class="tf">Skupaj ${sec}: ${euro(st)}</div></div>`;
   });
@@ -577,6 +578,29 @@ function rStan(){
   el.innerHTML=h;
 }
 
+function subIcon(s){
+  const n=(s.name||'').toLowerCase();
+  const c=(s.cat||'').toLowerCase();
+  if(n.includes('claude')||n.includes('anthropic')) return{i:'🤖',col:'#a78bfa'};
+  if(n.includes('canva')) return{i:'🎨',col:'#00c4cc'};
+  if(n.includes('google')) return{i:'☁️',col:'#4f8ef7'};
+  if(n.includes('apple')||n.includes('icloud')) return{i:'🍎',col:'#f2f3f5'};
+  if(n.includes('revolut')) return{i:'💳',col:'#f05555'};
+  if(n.includes('netflix')) return{i:'🎬',col:'#e50914'};
+  if(n.includes('spotify')) return{i:'🎵',col:'#1db954'};
+  if(n.includes('amazon')) return{i:'📦',col:'#f0a030'};
+  if(n.includes('magnific')) return{i:'✨',col:'#a78bfa'};
+  if(n.includes('adobe')) return{i:'🖌️',col:'#f05555'};
+  if(n.includes('github')) return{i:'💻',col:'#f2f3f5'};
+  if(c.includes('oblak')||c.includes('shranjevanje')) return{i:'☁️',col:'#4f8ef7'};
+  if(c.includes('programska')) return{i:'⚙️',col:'#9098a8'};
+  if(c.includes('igre')||c.includes('zabava')) return{i:'🎮',col:'#a78bfa'};
+  if(c.includes('fitnes')||c.includes('zdravje')) return{i:'💪',col:'#2dd87a'};
+  if(c.includes('izobraže')) return{i:'📚',col:'#f0a030'};
+  if(c.includes('varnost')||c.includes('vpn')) return{i:'🔒',col:'#2dd87a'};
+  return{i:'💳',col:'#f05555'};
+}
+
 function rNar(){
   const el=document.getElementById('s-narocnine');
   const mT=db.subscriptions.filter(s=>s.freq==='Mesečno').reduce((a,s)=>a+parseFloat(s.amount||0),0);
@@ -585,10 +609,16 @@ function rNar(){
   h+=`<div class="stats"><div class="stat"><div class="sl">Mesečno</div><div class="sv" style="color:var(--purple)">${euro(mT)}</div><div class="ss">${db.subscriptions.filter(s=>s.freq==='Mesečno').length} naročnin</div></div><div class="stat"><div class="sl">Letno</div><div class="sv">${euro(yT)}</div></div><div class="stat"><div class="sl">Skupaj letno</div><div class="sv">${euro(mT*12+yT)}</div><div class="ss">mes.×12+letne</div></div><div class="stat"><div class="sl">Število</div><div class="sv" style="color:var(--accent)">${db.subscriptions.length}</div></div></div>`;
   if(!db.subscriptions.length){h+=`<div class="empty">Ni naročnin.</div>`}else{
     h+=`<div class="sub-l">Aktivne naročnine</div><div class="cards">`;
-    db.subscriptions.forEach(s=>{h+=`<div class="card"><div style="display:flex;justify-content:space-between"><div><div class="ctitle">${s.name}</div><div class="csub">${s.cat}</div></div><button class="del" onclick="delI('subscriptions','${s.id}')">✕</button></div><div class="div"></div><div class="row"><span class="rl">Znesek</span><span style="font-family:monospace;font-size:13px;font-weight:500">${euro(s.amount)}<span style="font-size:11px;color:var(--text3)"> /${s.freq.toLowerCase()}</span></span></div>${s.day?`<div class="row"><span class="rl">Dan</span><span class="rv" style="font-family:inherit">${s.day}.</span></div>`:''}${s.date?`<div class="row"><span class="rl">Zadnje plačilo</span><span class="rv">${s.date}</span></div>`:''}</div>`});
+    db.subscriptions.forEach(s=>{
+      const{i,col}=subIcon(s);
+      h+=`<div class="card"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="display:flex;align-items:center;gap:10px"><div style="width:36px;height:36px;border-radius:10px;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${i}</div><div><div class="ctitle">${s.name}</div><div class="csub">${s.cat}</div></div></div><button class="del" onclick="delI('subscriptions','${s.id}')">✕</button></div><div class="div"></div><div class="row"><span class="rl">Znesek</span><span style="font-size:14px;font-weight:700;color:${col};font-variant-numeric:tabular-nums">${euro(s.amount)}<span style="font-size:11px;color:var(--text3);font-weight:400"> /${s.freq.toLowerCase()}</span></span></div>${s.day?`<div class="row"><span class="rl">Dan plačila</span><span class="rv" style="font-family:inherit">${s.day}.</span></div>`:''}${s.date?`<div class="row"><span class="rl">Zadnje plačilo</span><span class="rv">${s.date}</span></div>`:''}</div>`;
+    });
     h+=`</div><div class="sub-l">Seznam</div><div class="tbl"><div class="th" style="grid-template-columns:2fr 1.5fr 1fr 1fr 1fr 28px"><span>Naziv</span><span>Kategorija</span><span>Pogostost</span><span>Dan</span><span>Znesek</span><span></span></div>`;
-    [...db.subscriptions].sort((a,b)=>parseFloat(b.amount||0)-parseFloat(a.amount||0)).forEach(s=>{h+=`<div class="tr" style="grid-template-columns:2fr 1.5fr 1fr 1fr 1fr 28px"><div style="font-weight:500">${s.name}</div><div style="font-size:12px;color:var(--text2)">${s.cat}</div><div><span class="pill">${s.freq}</span></div><div style="font-family:monospace;font-size:12px">${s.day?s.day+'.':'—'}</div><div style="font-weight:500">${euro(s.amount)}</div><div><button class="del" onclick="delI('subscriptions','${s.id}')">✕</button></div></div>`});
-    h+=`<div class="tf" style="display:flex;justify-content:flex-end;gap:20px"><span style="color:var(--text2)">Mesečno: <b>${euro(mT)}</b></span><span style="color:var(--text2)">Letno: <b>${euro(yT)}</b></span></div></div>`;
+    [...db.subscriptions].sort((a,b)=>parseFloat(b.amount||0)-parseFloat(a.amount||0)).forEach(s=>{
+      const{i,col}=subIcon(s);
+      h+=`<div class="tr" style="grid-template-columns:2fr 1.5fr 1fr 1fr 1fr 28px"><div style="display:flex;align-items:center;gap:8px;font-weight:600"><span style="font-size:16px">${i}</span>${s.name}</div><div style="font-size:12px;color:var(--text2)">${s.cat}</div><div><span class="pill">${s.freq}</span></div><div style="font-size:13px;color:var(--text2)">${s.day?s.day+'.':'—'}</div><div style="font-weight:700;color:${col};font-variant-numeric:tabular-nums">${euro(s.amount)}</div><div><button class="del" onclick="delI('subscriptions','${s.id}')">✕</button></div></div>`;
+    });
+    h+=`<div class="tf" style="display:flex;justify-content:flex-end;gap:20px"><span style="color:var(--text2)">Mesečno: <b style="color:var(--text)">${euro(mT)}</b></span><span style="color:var(--text2)">Letno: <b style="color:var(--text)">${euro(yT)}</b></span></div></div>`;
   }
   el.innerHTML=h;
 }
