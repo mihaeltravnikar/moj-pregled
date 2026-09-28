@@ -671,8 +671,8 @@ function rSavings(container){
     const monthlyNeeded=monthsLeft&&monthsLeft>0?(remaining/monthsLeft):null;
 
     // Progress bar color
-    const barCol=pct>=100?'var(--green)':pct>=60?'var(--blue)':pct>=30?'var(--amber)':'var(--red)';
-    const barBg=pct>=100?'var(--green-bg)':pct>=60?'var(--blue-bg)':pct>=30?'var(--amber-bg)':'var(--red-bg)';
+    const barCol=pct>=90?'var(--green)':pct>=60?'var(--blue)':pct>=30?'var(--amber)':'var(--red)';
+    const barBg=pct>=90?'var(--green-bg)':pct>=60?'var(--blue-bg)':pct>=30?'var(--amber-bg)':'var(--red-bg)';
 
     // Motivational message
     let motiv='';
