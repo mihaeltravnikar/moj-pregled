@@ -531,31 +531,132 @@ function chMo(d){const [yr,mo]=_fm.split('-').map(Number);let nm=mo+d,ny=yr;if(n
 function rVoz(){
   const el=document.getElementById('s-vozila');
   const insT=db.insurances.reduce((a,i)=>a+parseFloat(i.premium||0),0);
-  const ni=[...db.insurances].filter(i=>daysTo(i.to)>=-1).sort((a,b)=>daysTo(a.to)-daysTo(b.to))[0];
+  const allIns=[...db.insurances].filter(i=>daysTo(i.to)>=-1).sort((a,b)=>daysTo(a.to)-daysTo(b.to));
+  const ni=allIns[0];
   const nd=ni?daysTo(ni.to):null;
+  const nextSvc=[...db.services].filter(s=>s.nextDate).sort((a,b)=>daysTo(a.nextDate)-daysTo(b.nextDate))[0];
+  const ndSvc=nextSvc?daysTo(nextSvc.nextDate):null;
+
+  // header
   let h=`<div class="hdr"><div><div class="htitle"><div class="hicon" style="background:var(--blue-bg)">🚗</div>Vozni park</div><div class="hsub">Vozila, zavarovanja, servisi</div></div><button class="add" onclick="om('mo-v')">+ Dodaj vozilo</button></div>`;
-  h+=`<div class="stats"><div class="stat"><div class="sl">Vozila</div><div class="sv" style="color:var(--accent)">${db.vehicles.length}</div></div><div class="stat"><div class="sl">Zavarovanja</div><div class="sv">${euro(insT)}</div><div class="ss">skupaj</div></div><div class="stat"><div class="sl">Naslednji rok</div><div class="sv" style="color:${nd!==null&&nd<=60?'var(--amber)':'var(--green)'}">${nd!==null?nd+' dni':'—'}</div><div class="ss">${ni?ni.to:''}</div></div></div>`;
+
+  // stat tiles — colored
+  const tileV=(label,val,col,bg,border,sub='')=>`<div style="background:${bg};border:1px solid ${border};border-radius:11px;padding:11px 12px 10px;text-align:center"><div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:5px">${label}</div><div style="font-size:17px;font-weight:700;color:${col};letter-spacing:-.03em;font-variant-numeric:tabular-nums">${val}</div>${sub?`<div style="font-size:10px;color:var(--text3);margin-top:3px">${sub}</div>`:''}</div>`;
+  const insCol=nd!==null&&nd<=60?'var(--amber)':nd!==null&&nd<0?'var(--red)':'var(--green)';
+  const insBg=nd!==null&&nd<=60?'rgba(240,160,48,0.06)':nd!==null&&nd<0?'rgba(240,85,85,0.06)':'rgba(45,216,122,0.06)';
+  const insBorder=nd!==null&&nd<=60?'rgba(240,160,48,0.22)':nd!==null&&nd<0?'rgba(240,85,85,0.22)':'rgba(45,216,122,0.22)';
+  const svcCol=ndSvc!==null&&ndSvc<=30?'var(--amber)':ndSvc!==null&&ndSvc<0?'var(--red)':'var(--text)';
+  h+=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1.25rem">
+    ${tileV('Vozila',db.vehicles.length,'var(--accent)','rgba(79,142,247,0.06)','rgba(79,142,247,0.22)')}
+    ${tileV('Zavarovanja',euro(insT),'var(--text)','var(--bg3)','var(--border2)','skupaj letno')}
+    ${tileV('Naslednji rok',nd!==null?(nd<0?'Poteklo':nd+' dni'):'—',insCol,insBg,insBorder,ni?ni.to:'')}
+    ${tileV('Naslednji servis',ndSvc!==null?(ndSvc<0?'Zamuja':ndSvc+' dni'):'—',svcCol,'var(--bg3)','var(--border2)',nextSvc?nextSvc.nextDate:'')}
+  </div>`;
+
+  // vozila cards
   h+=`<div class="sub-l">Vozila</div><div class="cards">`;
   db.vehicles.forEach(v=>{
     const vi=[...db.insurances].filter(i=>i.vehicleId===v.id&&daysTo(i.to)>=-1).sort((a,b)=>daysTo(a.to)-daysTo(b.to))[0];
     const vs=[...db.services].filter(s=>s.vehicleId===v.id).sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
-    h+=`<div class="card"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div class="ctitle">${v.name}</div><div class="csub">${v.make} ${v.model} · ${v.year} · ${v.fuel}</div></div><div style="display:flex;align-items:center;gap:6px"><span style="font-family:monospace;font-size:11px;padding:3px 8px;border-radius:4px;background:var(--bg3);color:var(--text2)">${v.reg}</span><button class="del" onclick="delI('vehicles','${v.id}')">✕</button></div></div><div class="div"></div><div class="row"><span class="rl">Km stanje</span><span style="display:flex;align-items:center;gap:6px"><span class="rv">${v.km?Number(v.km).toLocaleString('sl-SI')+' km':'—'}</span>${v.kmDate?`<span style="font-size:11px;color:var(--text3)">(${v.kmDate})</span>`:''}<button onclick="updKm('${v.id}')" style="border:1px solid var(--border2);border-radius:4px;background:none;color:var(--text3);font-size:11px;padding:2px 6px;cursor:pointer;font-family:inherit">+</button></span></div><div class="row"><span class="rl">Zavarovanje do</span><span class="rv" style="font-family:inherit">${vi?vi.to:'—'}</span></div><div class="row"><span class="rl">Zadnji servis</span><span class="rv" style="font-family:inherit">${vs?vs.date:'—'}</span></div><div class="row"><span class="rl">Naslednji servis</span><span class="rv" style="font-family:inherit">${vs&&vs.nextDate?vs.nextDate:'—'}</span></div></div>`;
+    const insD=vi?daysTo(vi.to):null;
+    const insC=insD!==null&&insD<=60?'var(--amber)':insD!==null&&insD<0?'var(--red)':'var(--text2)';
+    const svcD=vs&&vs.nextDate?daysTo(vs.nextDate):null;
+    const svcC=svcD!==null&&svcD<=30?'var(--amber)':svcD!==null&&svcD<0?'var(--red)':'var(--text2)';
+    h+=`<div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:40px;height:40px;border-radius:11px;background:var(--blue-bg);border:1px solid var(--blue-border);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🚗</div>
+          <div>
+            <div style="font-size:15px;font-weight:700;letter-spacing:-.02em;color:var(--text)">${v.name}</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:1px">${v.make} ${v.model} · ${v.year} · ${v.fuel}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:11px;font-weight:700;letter-spacing:.04em;padding:3px 9px;border-radius:6px;background:var(--bg4);border:1px solid var(--border2);color:var(--text2);font-variant-numeric:tabular-nums">${v.reg}</span>
+          <button class="del" onclick="delI('vehicles','${v.id}')">✕</button>
+        </div>
+      </div>
+      <div class="div"></div>
+      <div class="row"><span class="rl">Km stanje</span>
+        <span style="display:flex;align-items:center;gap:6px">
+          <span style="font-weight:700;font-variant-numeric:tabular-nums;color:var(--text)">${v.km?Number(v.km).toLocaleString('sl-SI')+' km':'—'}</span>
+          ${v.kmDate?`<span style="font-size:11px;color:var(--text3)">(${v.kmDate})</span>`:''}
+          <button onclick="updKm('${v.id}')" style="border:1px solid var(--border2);border-radius:5px;background:var(--bg3);color:var(--text3);font-size:11px;padding:2px 7px;cursor:pointer;font-family:inherit;transition:all .15s" onmouseover="this.style.borderColor='var(--border3)';this.style.color='var(--text2)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">+ km</button>
+        </span>
+      </div>
+      <div class="row"><span class="rl">Zavarovanje do</span><span style="font-weight:600;color:${insC}">${vi?vi.to:'—'}${insD!==null?`<span style="font-size:11px;font-weight:400;margin-left:5px;color:var(--text3)">${insD<0?'poteklo':insD+' dni'}</span>`:''}</span></div>
+      <div class="row"><span class="rl">Zadnji servis</span><span style="color:var(--text2);font-size:13px">${vs?vs.date:'—'}</span></div>
+      <div class="row"><span class="rl">Naslednji servis</span><span style="font-weight:600;color:${svcC}">${vs&&vs.nextDate?vs.nextDate:'—'}${svcD!==null?`<span style="font-size:11px;font-weight:400;margin-left:5px;color:var(--text3)">${svcD<0?'zamuda':svcD+' dni'}</span>`:''}</span></div>
+    </div>`;
   });
   h+=`</div>`;
+
+  // servisi
   h+=`<div style="display:flex;align-items:center;justify-content:space-between"><div class="sub-l" style="margin:0">Servisi</div><button class="add" onclick="om('mo-svc');pvs('svc-v')">+ Dodaj</button></div><div style="margin-bottom:.5rem"></div><div class="cards">`;
   [...db.services].sort((a,b)=>new Date(b.date)-new Date(a.date)).forEach(s=>{
     const v=db.vehicles.find(x=>x.id===s.vehicleId);
     const nd=s.nextDate?daysTo(s.nextDate):null;
     const nm=nd!==null?Math.round(Math.abs(nd)/30.5):0;
     let cb='';
-    if(nd!==null){const col=nd<0?'red':nd<=14?'red':nd<=60?'amber':'green';const lbl=nd<0?Math.abs(nd)+' dni zamude':nd+' dni · '+nm+' mes.';const txt=nd<0?'Zamuja!':nd<=14?'Kmalu!':nd<=60?'Prihaja':'Naslednji termin';cb=`<div style="background:var(--${col}-bg);border:1px solid var(--${col});border-radius:var(--r-sm);padding:9px 12px;margin-top:10px"><div style="font-size:11px;font-weight:500;color:var(--${col});text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px">${txt}</div><div style="font-size:20px;font-weight:500;color:var(--${col})">${lbl}</div><div style="font-size:11px;color:var(--${col});opacity:.8;margin-top:1px">${s.nextDate}</div></div>`}
-    h+=`<div class="card"><div style="display:flex;justify-content:space-between"><div><div class="ctitle">${v?v.name:'—'}</div><div class="csub">${v?v.reg:''} · ${s.type}</div></div><button class="del" onclick="delI('services','${s.id}')">✕</button></div><div class="div"></div><div class="row"><span class="rl">Zadnji servis</span><span class="rv" style="font-family:inherit">${s.date||'—'}</span></div>${s.km?`<div class="row"><span class="rl">Km ob servisu</span><span class="rv">${parseInt(s.km).toLocaleString('sl-SI')} km</span></div>`:''}<div class="row"><span class="rl">Skupni strošek</span><span class="rv">${s.price?euro(s.price):'—'}</span></div>${(parseFloat(s.priceLabour||0)>0||parseFloat(s.priceParts||0)>0)?`<div class="row"><span class="rl">Delo</span><span class="rv">${euro(s.priceLabour||0)}</span></div><div class="row"><span class="rl">Deli / material</span><span class="rv">${euro(s.priceParts||0)}</span></div>`:''}<div class="row"><span class="rl">Naslednji servis</span><span class="rv" style="font-family:inherit">${s.nextDate||'—'}</span></div>${s.note?`<div style="font-size:12px;color:var(--text2);margin-top:6px;line-height:1.5">${s.note}</div>`:''}${cb}</div>`;
+    if(nd!==null){
+      const col=nd<0?'red':nd<=14?'red':nd<=60?'amber':'green';
+      const lbl=nd<0?Math.abs(nd)+' dni zamude':nd+' dni · '+nm+' mes.';
+      const txt=nd<0?'⚠️ Zamuja!':nd<=14?'⚡ Kmalu!':nd<=60?'📅 Prihaja':'✓ Naslednji termin';
+      cb=`<div style="background:var(--${col}-bg);border:1px solid var(--${col});border-radius:var(--r-sm);padding:10px 14px;margin-top:12px;display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--${col});text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">${txt}</div>
+          <div style="font-size:22px;font-weight:700;color:var(--${col});letter-spacing:-.03em">${lbl}</div>
+        </div>
+        <div style="font-size:12px;color:var(--${col});opacity:.7;font-weight:600">${s.nextDate}</div>
+      </div>`;
+    }
+    const strošek=parseFloat(s.price||0);
+    h+=`<div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:38px;height:38px;border-radius:10px;background:var(--amber-bg);border:1px solid rgba(240,160,48,0.25);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🔧</div>
+          <div>
+            <div style="font-size:14px;font-weight:700;color:var(--text)">${v?v.name:'—'}</div>
+            <div style="font-size:12px;color:var(--text3)">${v?v.reg:''} · ${s.type}</div>
+          </div>
+        </div>
+        <button class="del" onclick="delI('services','${s.id}')">✕</button>
+      </div>
+      <div class="div"></div>
+      <div class="row"><span class="rl">Datum servisa</span><span style="font-weight:600;color:var(--text)">${s.date||'—'}</span></div>
+      ${s.km?`<div class="row"><span class="rl">Km ob servisu</span><span style="font-variant-numeric:tabular-nums;font-weight:600">${parseInt(s.km).toLocaleString('sl-SI')} km</span></div>`:''}
+      <div class="row"><span class="rl">Skupni strošek</span><span style="font-size:15px;font-weight:700;color:var(--amber);font-variant-numeric:tabular-nums">${strošek>0?euro(strošek):'—'}</span></div>
+      ${(parseFloat(s.priceLabour||0)>0||parseFloat(s.priceParts||0)>0)?`
+        <div class="row"><span class="rl">Delo</span><span style="color:var(--text2);font-variant-numeric:tabular-nums">${euro(s.priceLabour||0)}</span></div>
+        <div class="row"><span class="rl">Deli / material</span><span style="color:var(--text2);font-variant-numeric:tabular-nums">${euro(s.priceParts||0)}</span></div>`:''}
+      <div class="row"><span class="rl">Naslednji servis</span><span style="color:var(--text2);font-size:13px">${s.nextDate||'—'}</span></div>
+      ${s.note?`<div style="font-size:12px;color:var(--text2);margin-top:8px;line-height:1.6;padding:8px 10px;background:var(--bg3);border-radius:var(--r-xs);border:1px solid var(--border)">${s.note}</div>`:''}
+      ${cb}
+    </div>`;
   });
   if(!db.services.length)h+=`<div class="empty">Ni servisov.</div>`;
   h+=`</div>`;
+
+  // zavarovanja
   h+=`<div style="display:flex;align-items:center;justify-content:space-between"><div class="sub-l" style="margin:0">Zavarovanja</div><button class="add" onclick="om('mo-ins');pvs('i-v')">+ Dodaj</button></div><div style="margin-bottom:.5rem"></div>`;
-  h+=`<div class="tbl"><div class="th" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 28px"><span>Vrsta</span><span>Vozilo</span><span>Plačano</span><span>Znesek</span><span>Do</span><span></span></div>`;
-  [...db.insurances].sort((a,b)=>daysTo(a.to)-daysTo(b.to)).forEach(i=>{const d=daysTo(i.to);const bc=d<0?'var(--red)':d<=60?'var(--amber)':'var(--green)';h+=`<div class="tr" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 28px"><div><div style="font-weight:500;font-size:13px">${i.type}</div><div style="font-size:11px;color:var(--text3)">${i.company}${i.policy?' · #'+i.policy:''}</div></div><div style="font-size:12px;color:var(--text2)">${vn(i.vehicleId)}</div><div style="font-family:monospace;font-size:12px">${i.paid||'—'}</div><div style="font-weight:500">${euro(i.premium)}</div><div><span style="color:${bc};font-size:12px;font-weight:500">${d<0?'Poteklo':d+'d'}</span></div><div><button class="del" onclick="delI('insurances','${i.id}')">✕</button></div></div>`});
+  h+=`<div class="tbl"><div class="th" style="grid-template-columns:2.2fr 1fr 1fr 1fr 1.2fr 28px"><span>Vrsta</span><span>Vozilo</span><span>Plačano</span><span>Znesek</span><span>Veljavnost</span><span></span></div>`;
+  [...db.insurances].sort((a,b)=>daysTo(a.to)-daysTo(b.to)).forEach(i=>{
+    const d=daysTo(i.to);
+    const bc=d<0?'var(--red)':d<=60?'var(--amber)':'var(--green)';
+    const bbg=d<0?'rgba(240,85,85,0.1)':d<=60?'rgba(240,160,48,0.1)':'rgba(45,216,122,0.1)';
+    const dLabel=d<0?'Poteklo':d<=60?d+' dni':'✓ '+d+' dni';
+    h+=`<div class="tr" style="grid-template-columns:2.2fr 1fr 1fr 1fr 1.2fr 28px">
+      <div><div style="font-weight:600;font-size:13px">${i.type}</div><div style="font-size:11px;color:var(--text3);margin-top:2px">${i.company}${i.policy?' · #'+i.policy:''}</div></div>
+      <div><span style="font-size:11px;font-weight:700;padding:2px 7px;border-radius:5px;background:var(--bg4);border:1px solid var(--border2);color:var(--text2)">${vn(i.vehicleId)}</span></div>
+      <div style="font-size:12px;color:var(--text2)">${i.paid||'—'}</div>
+      <div style="font-weight:700;font-variant-numeric:tabular-nums">${euro(i.premium)}</div>
+      <div style="display:flex;flex-direction:column;gap:2px">
+        <span style="font-size:12px;color:var(--text3)">${i.to}</span>
+        <span style="font-size:11px;font-weight:700;color:${bc};background:${bbg};padding:1px 7px;border-radius:4px;display:inline-block;width:fit-content">${dLabel}</span>
+      </div>
+      <div><button class="del" onclick="delI('insurances','${i.id}')">✕</button></div>
+    </div>`;
+  });
   h+=`</div>`;
   el.innerHTML=h;
 }
