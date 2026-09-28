@@ -242,6 +242,143 @@ function rFin(){
   const balPct=Math.max(100-outPct-savPct,0);
   const secs={};items.forEach(i=>{if(!secs[i.sec])secs[i.sec]=[];secs[i.sec].push(i)});
   let h=`<div class="hdr"><div><div class="htitle"><div class="hicon" style="background:var(--green-bg)">💰</div>Finance</div><div class="hsub">Plača: 15. v mesecu</div></div><button class="add" onclick="om('mo-fin');document.getElementById('f-mo').value='${_fm}'">+ Vnesi plačo</button></div>`;
+
+  // === GRAFIČNI PREGLED PO OBDOBJIH ===
+  const allFin=[...db.finances].filter(f=>f.salary).sort((a,b)=>a.month.localeCompare(b.month));
+  const now=new Date();
+  const curMo=now.toISOString().slice(0,7);
+
+  function getMonthsBack(n){
+    const res=[];
+    for(let i=n-1;i>=0;i--){
+      const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+      res.push(d.toISOString().slice(0,7));
+    }
+    return res;
+  }
+
+  function buildPeriodChart(months){
+    const data=months.map(m=>{
+      const f=allFin.find(x=>x.month===m);
+      if(!f)return null;
+      const inc=parseFloat(f.salary||0)+parseFloat(f.extra||0);
+      const sav=parseFloat(f.savedThisMonth||0);
+      // odhodki = vse kar ni preostanek ali varčevanje
+      // ker ne sledimo točno, izračunamo iz checking+revolut-creditCard
+      const check=parseFloat(f.checking||0);
+      const rev=parseFloat(f.revolut||0);
+      const cc=parseFloat(f.creditCard||0);
+      const remain=Math.max(check+rev-cc,0);
+      const out=Math.max(inc-sav-remain,0);
+      return{m,inc,sav,out,remain,label:MN[parseInt(m.slice(5,7))-1].slice(0,3)+" '"+m.slice(2,4)};
+    }).filter(Boolean);
+    return data;
+  }
+
+  const periods=[
+    {id:'p1m',label:'1M',months:getMonthsBack(1)},
+    {id:'p3m',label:'3M',months:getMonthsBack(3)},
+    {id:'p6m',label:'6M',months:getMonthsBack(6)},
+    {id:'p1y',label:'1L',months:getMonthsBack(12)},
+  ];
+
+  function renderPeriodChart(pid){
+    const p=periods.find(x=>x.id===pid);
+    const data=buildPeriodChart(p.months);
+    if(!data.length)return`<div style="text-align:center;color:var(--text3);padding:2rem;font-size:13px">Ni podatkov za to obdobje.</div>`;
+
+    // Totals for summary row
+    const totIn=data.reduce((a,d)=>a+d.inc,0);
+    const totOut=data.reduce((a,d)=>a+d.out,0);
+    const totSav=data.reduce((a,d)=>a+d.sav,0);
+    const totRem=data.reduce((a,d)=>a+d.remain,0);
+
+    const maxVal=Math.max(...data.map(d=>d.inc),1);
+    const W=100; // % based
+    const barH=44;
+    const gap=data.length>4?8:14;
+    const barW=Math.floor((W-gap*(data.length-1))/data.length);
+
+    // Build SVG bars
+    let bars='';
+    data.forEach((d,i)=>{
+      const x=i*(barW+gap);
+      const scale=v=>Math.round((v/maxVal)*barH*10)/10;
+      const hIn=scale(d.inc);
+      const hOut=scale(d.out);
+      const hSav=scale(d.sav);
+      const hRem=Math.max(hIn-hOut-hSav,0);
+
+      // Stacked bar: odhodki(red) + varčevanje(blue) + preostanek(green)
+      let y=barH;
+      const segs=[];
+      if(hOut>0){y-=hOut;segs.push(`<rect x="${x}" y="${y}" width="${barW}" height="${hOut}" fill="var(--red)" rx="2" opacity=".85"/>`);}
+      if(hSav>0){y-=hSav;segs.push(`<rect x="${x}" y="${y}" width="${barW}" height="${hSav}" fill="var(--accent)" rx="2" opacity=".9"/>`);}
+      if(hRem>0){y-=hRem;segs.push(`<rect x="${x}" y="${y}" width="${barW}" height="${hRem}" fill="var(--green)" rx="2" opacity=".9"/>`);}
+
+      bars+=`<g>
+        ${segs.join('')}
+        <text x="${x+barW/2}" y="${barH+11}" text-anchor="middle" style="font-size:9px;fill:var(--text3)">${d.label}</text>
+        <text x="${x+barW/2}" y="${barH+21}" text-anchor="middle" style="font-size:8px;fill:var(--text2)">${Math.round(d.inc)}€</text>
+      </g>`;
+    });
+
+    const svgW=data.length*(barW+gap);
+
+    return`
+    <svg viewBox="0 0 ${svgW} ${barH+26}" style="width:100%;max-height:120px;overflow:visible">
+      ${bars}
+    </svg>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;font-size:11px">
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--red);display:inline-block"></span> Odhodki <strong>${Math.round(totOut)} €</strong></span>
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--accent);display:inline-block"></span> Varčevanje <strong>${Math.round(totSav)} €</strong></span>
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--green);display:inline-block"></span> Preostanek <strong>${Math.round(totRem)} €</strong></span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px">
+      <div style="text-align:center;background:var(--bg3);border-radius:var(--r-sm);padding:6px 4px">
+        <div style="font-size:10px;color:var(--text3);margin-bottom:2px">PRIHODKI</div>
+        <div style="font-size:15px;font-weight:600;color:var(--text)">${Math.round(totIn)} €</div>
+      </div>
+      <div style="text-align:center;background:var(--red-bg);border-radius:var(--r-sm);padding:6px 4px">
+        <div style="font-size:10px;color:var(--text3);margin-bottom:2px">ODHODKI</div>
+        <div style="font-size:15px;font-weight:600;color:var(--red)">${Math.round(totOut)} €</div>
+      </div>
+      <div style="text-align:center;background:var(--blue-bg);border-radius:var(--r-sm);padding:6px 4px">
+        <div style="font-size:10px;color:var(--text3);margin-bottom:2px">VARČEVANJE</div>
+        <div style="font-size:15px;font-weight:600;color:var(--accent)">${Math.round(totSav)} €</div>
+      </div>
+      <div style="text-align:center;background:var(--green-bg);border-radius:var(--r-sm);padding:6px 4px">
+        <div style="font-size:10px;color:var(--text3);margin-bottom:2px">PREOSTANEK</div>
+        <div style="font-size:15px;font-weight:600;color:var(--green)">${Math.round(totRem)} €</div>
+      </div>
+    </div>`;
+  }
+
+  let _activePeriod='p3m';
+  h+=`<div class="card" style="margin-bottom:1.25rem">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-size:13px;font-weight:500">Grafični pregled</div>
+      <div style="display:flex;gap:4px" id="period-tabs">
+        ${periods.map(p=>`<button onclick="switchPeriod('${p.id}')" id="ptab-${p.id}" style="padding:3px 10px;border-radius:5px;border:1px solid var(--border2);background:${p.id==='p3m'?'var(--bg4)':'none'};color:${p.id==='p3m'?'var(--text)':'var(--text3)'};font-size:12px;cursor:pointer;font-family:inherit;font-weight:${p.id==='p3m'?'500':'400'};transition:all .15s">${p.label}</button>`).join('')}
+      </div>
+    </div>
+    <div id="period-chart-area">${renderPeriodChart('p3m')}</div>
+  </div>`;
+
+  // Register switchPeriod globally
+  if(!window._periodChartInit){
+    window._periodChartInit=true;
+    window.switchPeriod=function(pid){
+      periods.forEach(p=>{
+        const btn=document.getElementById('ptab-'+p.id);
+        if(!btn)return;
+        if(p.id===pid){btn.style.background='var(--bg4)';btn.style.color='var(--text)';btn.style.fontWeight='500';}
+        else{btn.style.background='none';btn.style.color='var(--text3)';btn.style.fontWeight='400';}
+      });
+      document.getElementById('period-chart-area').innerHTML=renderPeriodChart(pid);
+    };
+  }
+
   // Line chart varčevanja skozi mesece
   const finSorted2=[...db.finances].filter(f=>f.salary).sort((a,b)=>a.month.localeCompare(b.month));
   if(finSorted2.length>1){
