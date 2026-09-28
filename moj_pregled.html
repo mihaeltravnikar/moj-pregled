@@ -671,8 +671,8 @@ function rSavings(container){
     const monthlyNeeded=monthsLeft&&monthsLeft>0?(remaining/monthsLeft):null;
 
     // Progress bar color
-    const barCol=pct>=90?'var(--green)':pct>=60?'var(--blue)':pct>=30?'var(--amber)':'var(--red)';
-    const barBg=pct>=90?'var(--green-bg)':pct>=60?'var(--blue-bg)':pct>=30?'var(--amber-bg)':'var(--red-bg)';
+    const barCol=pct>=80?'var(--green)':pct>=60?'#2dd8b0':pct>=40?'var(--blue)':pct>=20?'var(--amber)':'var(--red)';
+    const barBg=pct>=80?'var(--green-bg)':pct>=60?'rgba(45,216,176,0.1)':pct>=40?'var(--blue-bg)':pct>=20?'var(--amber-bg)':'var(--red-bg)';
 
     // Motivational message
     let motiv='';
