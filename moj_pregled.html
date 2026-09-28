@@ -4,77 +4,119 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Moj Pregled</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#0e0f11;--bg2:#141618;--bg3:#1c1e22;--bg4:#242729;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--text:#f0f0f0;--text2:#8a8f9a;--text3:#4a4f5a;--accent:#4f8ef7;--green:#34c98a;--amber:#f0a030;--red:#e85555;--purple:#a78bfa;--green-bg:rgba(52,201,138,0.1);--amber-bg:rgba(240,160,48,0.1);--red-bg:rgba(232,85,85,0.1);--blue-bg:rgba(79,142,247,0.1);--r:12px;--r-sm:8px}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px}
-nav{position:sticky;top:0;z-index:100;background:rgba(14,15,17,0.95);border-bottom:1px solid var(--border);padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:56px}
-.nav-logo{font-size:15px;font-weight:500;display:flex;align-items:center;gap:8px}
-.dot{width:7px;height:7px;border-radius:50%;background:var(--accent);display:inline-block}
-.nav-links{display:flex;gap:2px;flex-wrap:wrap}
-.nav-btn-t{padding:6px 12px;border-radius:var(--r-sm);font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;border:none;background:none;font-family:inherit;transition:all .15s}
-.nav-btn-t:hover,.nav-btn-t.on{background:var(--bg3);color:var(--text)}
-.nav-date{font-size:12px;color:var(--text3);font-family:monospace}
-main{max-width:1060px;margin:0 auto;padding:1.5rem 1.5rem 5rem}
+:root{
+  --bg:#0c0d0f;--bg2:#131517;--bg3:#1a1c20;--bg4:#222529;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.12);--border3:rgba(255,255,255,0.20);
+  --text:#f2f3f5;--text2:#9098a8;--text3:#555d6e;
+  --accent:#4f8ef7;--accent-dim:rgba(79,142,247,0.15);
+  --green:#2dd87a;--green-bg:rgba(45,216,122,0.10);--green-border:rgba(45,216,122,0.25);
+  --amber:#f0a030;--amber-bg:rgba(240,160,48,0.10);
+  --red:#f05555;--red-bg:rgba(240,85,85,0.10);--red-border:rgba(240,85,85,0.25);
+  --blue:#4f8ef7;--blue-bg:rgba(79,142,247,0.10);--blue-border:rgba(79,142,247,0.25);
+  --purple:#a78bfa;--purple-bg:rgba(167,139,250,0.10);
+  --r:14px;--r-sm:9px;--r-xs:6px
+}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
 
-/* reuse widget styles */
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(12,13,15,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2);padding:0 1.75rem;display:flex;align-items:center;justify-content:space-between;height:58px}
+.nav-logo{font-size:15px;font-weight:700;letter-spacing:-.02em;display:flex;align-items:center;gap:9px;color:var(--text)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block;box-shadow:0 0 8px rgba(79,142,247,.5)}
+.nav-links{display:flex;gap:2px;flex-wrap:wrap}
+.nav-btn-t{padding:6px 13px;border-radius:var(--r-sm);font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;border:none;background:none;font-family:inherit;transition:all .15s;letter-spacing:-.01em}
+.nav-btn-t:hover{background:var(--bg3);color:var(--text)}
+.nav-btn-t.on{background:var(--bg3);color:var(--text)}
+.nav-date{font-size:12px;color:var(--text3);font-variant-numeric:tabular-nums;letter-spacing:.01em}
+
+main{max-width:1080px;margin:0 auto;padding:1.75rem 1.75rem 5rem}
+
+/* TABS */
 .app{font-size:14px}
-.tabs{display:flex;gap:2px;border-bottom:.5px solid var(--border);margin-bottom:1.25rem;flex-wrap:wrap}
-.tab{padding:7px 14px;border:none;background:none;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:inherit;transition:all .15s}
-.tab.on{color:var(--text);border-bottom-color:var(--text)}
-.tab:hover:not(.on){color:var(--text)}
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--border2);margin-bottom:1.5rem;flex-wrap:wrap}
+.tab{padding:9px 16px;border:none;background:none;font-size:13px;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:inherit;transition:all .2s;letter-spacing:-.01em}
+.tab.on{color:var(--text);border-bottom-color:var(--accent)}
+.tab:hover:not(.on){color:var(--text2)}
 .sec{display:none}.sec.on{display:block}
-.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-bottom:.875rem;border-bottom:1px solid var(--border)}
-.htitle{font-size:16px;font-weight:500;display:flex;align-items:center;gap:8px}
-.hicon{width:30px;height:30px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:15px}
-.hsub{font-size:12px;color:var(--text2);margin-top:2px}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:1.25rem}
-.stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:.75rem 1rem}
-.sl{font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
-.sv{font-size:20px;font-weight:500}
-.ss{font-size:11px;color:var(--text3);margin-top:2px}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin-bottom:1.25rem}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1rem 1.125rem;transition:border-color .2s}
-.card:hover{border-color:var(--border2)}
-.ctitle{font-size:14px;font-weight:500}
-.csub{font-size:12px;color:var(--text2)}
-.div{height:1px;background:var(--border);margin:8px 0}
-.row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:13px}
+
+/* SECTION HEADER */
+.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid var(--border2)}
+.htitle{font-size:20px;font-weight:700;display:flex;align-items:center;gap:10px;letter-spacing:-.03em;color:var(--text)}
+.hicon{width:34px;height:34px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:17px;background:var(--bg3)}
+.hsub{font-size:13px;color:var(--text2);margin-top:3px;font-weight:400}
+
+/* STAT TILES */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:1.5rem}
+.stat{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:.875rem 1.125rem;transition:border-color .2s}
+.stat:hover{border-color:var(--border3)}
+.sl{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px}
+.sv{font-size:22px;font-weight:700;letter-spacing:-.03em;line-height:1.1}
+.sv.c-green{color:var(--green)}
+.sv.c-red{color:var(--red)}
+.sv.c-blue{color:var(--blue)}
+.sv.c-white{color:var(--text)}
+.ss{font-size:12px;color:var(--text3);margin-top:4px;font-weight:400}
+
+/* CARDS */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:12px;margin-bottom:1.5rem}
+.card{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:1.125rem 1.25rem;transition:border-color .2s}
+.card:hover{border-color:var(--border3)}
+.ctitle{font-size:15px;font-weight:600;letter-spacing:-.02em;color:var(--text)}
+.csub{font-size:12px;color:var(--text2);margin-top:2px}
+.div{height:1px;background:var(--border2);margin:10px 0}
+.row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:13px}
 .rl{color:var(--text2)}
-.rv{font-weight:500;font-size:12px;font-family:monospace}
-.tbl{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:1.25rem}
-.th{display:grid;padding:7px 14px;background:var(--bg3);border-bottom:1px solid var(--border);font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.05em}
-.tr{display:grid;padding:10px 14px;border-bottom:1px solid var(--border);align-items:center;font-size:13px;transition:background .15s}
+.rv{font-weight:600;font-size:13px;font-variant-numeric:tabular-nums;color:var(--text)}
+
+/* TABLE */
+.tbl{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);overflow:hidden;margin-bottom:1.5rem}
+.th{display:grid;padding:8px 16px;background:var(--bg3);border-bottom:1px solid var(--border2);font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em}
+.tr{display:grid;padding:11px 16px;border-bottom:1px solid var(--border);align-items:center;font-size:13px;transition:background .15s}
 .tr:last-child{border-bottom:none}
-.tr:hover{background:rgba(255,255,255,0.02)}
-.tf{padding:8px 14px;border-top:1px solid var(--border2);font-size:12px;font-weight:500;text-align:right;font-family:monospace;color:var(--text2)}
-.pill{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:500;background:var(--bg3);color:var(--text2);border:1px solid var(--border2)}
-.add{padding:5px 11px;border-radius:var(--r-sm);border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;transition:all .15s}
-.add:hover{background:var(--bg3);color:var(--text)}
-.sub-l{font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin:.875rem 0 .4rem}
-.del{background:none;border:none;cursor:pointer;color:var(--text3);font-size:14px;padding:2px 5px;border-radius:4px;line-height:1;transition:all .15s}
+.tr:hover{background:rgba(255,255,255,0.025)}
+.tf{padding:9px 16px;border-top:1px solid var(--border2);font-size:13px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums;color:var(--text2)}
+
+/* PILLS & BUTTONS */
+.pill{display:inline-block;padding:3px 8px;border-radius:var(--r-xs);font-size:11px;font-weight:600;background:var(--bg3);color:var(--text2);border:1px solid var(--border2);letter-spacing:.01em}
+.pill.p-green{background:var(--green-bg);color:var(--green);border-color:var(--green-border)}
+.pill.p-red{background:var(--red-bg);color:var(--red);border-color:var(--red-border)}
+.pill.p-blue{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-border)}
+.add{padding:6px 13px;border-radius:var(--r-sm);border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px;transition:all .15s}
+.add:hover{background:var(--bg3);color:var(--text);border-color:var(--border3)}
+.sub-l{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin:1.125rem 0 .5rem}
+.del{background:none;border:none;cursor:pointer;color:var(--text3);font-size:14px;padding:3px 6px;border-radius:var(--r-xs);line-height:1;transition:all .15s}
 .del:hover{color:var(--red);background:var(--red-bg)}
-.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;align-items:center;justify-content:center}
+
+/* MODAL */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
 .mo.on{display:flex}
-.md{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:1.25rem;width:min(440px,96vw);max-height:88vh;overflow-y:auto}
-.mt{font-size:15px;font-weight:500;margin-bottom:1rem}
-.fg{margin-bottom:10px}
-.fg label{display:block;font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
-.fg input,.fg select,.fg textarea{font-family:inherit;font-size:14px;padding:8px 11px;border:1px solid var(--border2);border-radius:var(--r-sm);background:var(--bg3);color:var(--text);width:100%;transition:border-color .15s}
-.fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--accent)}
+.md{background:var(--bg2);border:1px solid var(--border3);border-radius:var(--r);padding:1.5rem;width:min(460px,96vw);max-height:88vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.5)}
+.mt{font-size:17px;font-weight:700;letter-spacing:-.03em;margin-bottom:1.25rem;color:var(--text)}
+.fg{margin-bottom:12px}
+.fg label{display:block;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px}
+.fg input,.fg select,.fg textarea{font-family:inherit;font-size:14px;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);background:var(--bg3);color:var(--text);width:100%;transition:border-color .15s;font-weight:400}
+.fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,142,247,.12)}
 .fg select option{background:var(--bg3)}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.mf{display:flex;gap:8px;justify-content:flex-end;margin-top:1rem}
-.bc{padding:6px 13px;border-radius:var(--r-sm);border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:13px;cursor:pointer;font-family:inherit}
-.bs{padding:6px 16px;border-radius:var(--r-sm);border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit}
-.empty{text-align:center;padding:2rem;color:var(--text3);font-size:13px}
-.nav-mo{display:flex;align-items:center;gap:10px;margin-bottom:1.25rem}
-.nav-btn{padding:4px 12px;border-radius:var(--r-sm);border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-size:14px;font-family:inherit;transition:all .15s}
-.nav-btn:hover{background:var(--bg3);color:var(--text)}
-.bar-wrap{background:var(--bg3);border-radius:6px;overflow:hidden;height:24px;display:flex;margin:6px 0 4px}
-.bar-out{background:var(--red-bg);border-right:1px solid var(--red);height:100%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--red);transition:width .4s}
-.bar-in{background:var(--green-bg);height:100%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--green);transition:width .4s}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mf{display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem}
+.bc{padding:7px 16px;border-radius:var(--r-sm);border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s}
+.bc:hover{border-color:var(--border3);color:var(--text)}
+.bs{padding:7px 18px;border-radius:var(--r-sm);border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:opacity .15s;letter-spacing:-.01em}
+.bs:hover{opacity:.88}
+.empty{text-align:center;padding:2.5rem;color:var(--text3);font-size:13px}
+
+/* MISC */
+.nav-mo{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem}
+.nav-btn{padding:5px 13px;border-radius:var(--r-sm);border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-size:13px;font-weight:500;font-family:inherit;transition:all .15s}
+.nav-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--border3)}
+.bar-wrap{background:var(--bg3);border-radius:6px;overflow:hidden;height:26px;display:flex;margin:7px 0 5px}
+.bar-out{background:var(--red-bg);border-right:1px solid var(--red);height:100%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--red);transition:width .4s}
+.bar-in{background:var(--green-bg);height:100%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--green);transition:width .4s}
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px}
 footer{text-align:center;padding:2rem;font-size:12px;color:var(--text3);border-top:1px solid var(--border)}
 </style>
@@ -83,7 +125,7 @@ footer{text-align:center;padding:2rem;font-size:12px;color:var(--text3);border-t
 <nav>
   <div class="nav-logo"><span class="dot"></span>Moj Pregled</div>
   <div class="nav-links" id="nav-tabs"></div>
-  <div style="display:flex;align-items:center;gap:12px"><div class="nav-date" id="nav-date"></div><button onclick="resetData()" style="padding:4px 10px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text3);font-size:11px;cursor:pointer;font-family:inherit" title="Počisti cache in naloži sveže podatke">↺ Osveži</button></div>
+  <div style="display:flex;align-items:center;gap:12px"><div class="nav-date" id="nav-date"></div><button onclick="resetData()" style="padding:5px 12px;border-radius:var(--r-sm);border:1px solid var(--border2);background:transparent;color:var(--text3);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s;letter-spacing:-.01em" onmouseover="this.style.color='var(--text)';this.style.borderColor='var(--border3)'" onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border2)'" title="Počisti cache in naloži sveže podatke">↺ Osveži</button></div>
 </nav>
 <main>
 <div class="app" style="position:relative" id="app">
@@ -274,23 +316,16 @@ function rFin(){
 
     function renderTiles(slice,el){
       const t=slice.reduce((a,d)=>({inc:a.inc+d.inc,out:a.out+d.out,sav:a.sav+d.sav,rem:a.rem+d.rem}),{inc:0,out:0,sav:0,rem:0});
-      el.innerHTML=`
-        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:9px 10px 8px;text-align:center">
-          <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:3px">Prihodki</div>
-          <div style="font-family:monospace;font-size:15px;font-weight:500;color:var(--text)">${eu(t.inc)}</div>
-        </div>
-        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:9px 10px 8px;text-align:center">
-          <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:3px">Odhodki</div>
-          <div style="font-family:monospace;font-size:15px;font-weight:500;color:var(--red)">${eu(t.out)}</div>
-        </div>
-        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:9px 10px 8px;text-align:center">
-          <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:3px">Varčevanje</div>
-          <div style="font-family:monospace;font-size:15px;font-weight:500;color:var(--accent)">${eu(t.sav)}</div>
-        </div>
-        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:9px 10px 8px;text-align:center">
-          <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:3px">Preostanek</div>
-          <div style="font-family:monospace;font-size:15px;font-weight:500;color:var(--green)">${eu(t.rem)}</div>
+      const tile=(label,val,col,bg,border)=>`
+        <div style="background:${bg};border:1px solid ${border};border-radius:11px;padding:11px 12px 10px;text-align:center">
+          <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:5px">${label}</div>
+          <div style="font-size:17px;font-weight:700;color:${col};letter-spacing:-.03em;font-variant-numeric:tabular-nums">${eu(val)}</div>
         </div>`;
+      el.innerHTML=
+        tile('Prihodki',t.inc,'var(--green)','rgba(45,216,122,0.06)','rgba(45,216,122,0.2)')+
+        tile('Odhodki',t.out,'var(--red)','rgba(240,85,85,0.06)','rgba(240,85,85,0.2)')+
+        tile('Varčevanje',t.sav,'var(--blue)','rgba(79,142,247,0.06)','rgba(79,142,247,0.2)')+
+        tile('Preostanek',t.rem,'var(--text)','var(--bg3)','var(--border2)');
     }
 
     function drawChart(slice,svgEl){
@@ -357,11 +392,11 @@ function rFin(){
       const wrap=tip.parentElement;
       const wRect=wrap.getBoundingClientRect();
       const cx=g.padL+i*g.groupW+g.groupW/2;
-      tip.innerHTML=`<div style="font-weight:600;margin-bottom:6px;font-size:12px">${d.label} ${d.m.slice(0,4)}${d.extra?` <span style="color:#f0a030;font-size:10px;font-weight:400">+${Math.round(d.extra).toLocaleString('sl-SI')}€ reg.</span>`:''}</div>
-        <div style="display:flex;justify-content:space-between;gap:18px;padding:1px 0"><span style="color:#4a4f5a">Prihodki</span><span style="font-family:monospace;color:#f0f0f0">${eu(d.inc)}</span></div>
-        <div style="display:flex;justify-content:space-between;gap:18px;padding:1px 0"><span style="color:#4a4f5a">Odhodki</span><span style="font-family:monospace;color:#e85555">${eu(d.out)}</span></div>
-        <div style="display:flex;justify-content:space-between;gap:18px;padding:1px 0"><span style="color:#4a4f5a">Varčevanje</span><span style="font-family:monospace;color:#4f8ef7">${eu(d.sav)}</span></div>
-        <div style="display:flex;justify-content:space-between;gap:18px;padding:1px 0"><span style="color:#4a4f5a">Preostanek</span><span style="font-family:monospace;color:#34c98a">${eu(d.rem)}</span></div>`;
+      tip.innerHTML=`<div style="font-weight:700;margin-bottom:8px;font-size:12px;letter-spacing:-.02em;color:#f2f3f5">${d.label} ${d.m.slice(0,4)}${d.extra?` <span style="color:#f0a030;font-size:10px;font-weight:500">+${Math.round(d.extra).toLocaleString('sl-SI')}€ reg.</span>`:''}</div>
+        <div style="display:flex;justify-content:space-between;gap:20px;padding:2px 0"><span style="color:#555d6e;font-size:11px">Prihodki</span><span style="font-variant-numeric:tabular-nums;font-weight:600;color:#2dd87a;font-size:12px">${eu(d.inc)}</span></div>
+        <div style="display:flex;justify-content:space-between;gap:20px;padding:2px 0"><span style="color:#555d6e;font-size:11px">Odhodki</span><span style="font-variant-numeric:tabular-nums;font-weight:600;color:#f05555;font-size:12px">${eu(d.out)}</span></div>
+        <div style="display:flex;justify-content:space-between;gap:20px;padding:2px 0"><span style="color:#555d6e;font-size:11px">Varčevanje</span><span style="font-variant-numeric:tabular-nums;font-weight:600;color:#4f8ef7;font-size:12px">${eu(d.sav)}</span></div>
+        <div style="display:flex;justify-content:space-between;gap:20px;padding:2px 0"><span style="color:#555d6e;font-size:11px">Preostanek</span><span style="font-variant-numeric:tabular-nums;font-weight:600;color:#f2f3f5;font-size:12px">${eu(d.rem)}</span></div>`;
       tip.style.opacity='1';
       const tipH=tip.offsetHeight||104;
       const yMid=g.padT+g.lineH+g.sep+g.barH/2;
@@ -383,16 +418,16 @@ function rFin(){
     }
 
     h+=`<div class="card" style="margin-bottom:1.25rem">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:8px">
         <div>
-          <div style="font-size:14px;font-weight:600">Finančni pregled</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:1px" id="fc-sub">Zadnji 3 meseci</div>
+          <div style="font-size:16px;font-weight:700;letter-spacing:-.03em;color:var(--text)">Finančni pregled</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:2px;font-weight:400" id="fc-sub">Zadnji 3 meseci</div>
         </div>
-        <div style="display:flex;gap:3px;background:var(--bg3);border-radius:9px;padding:3px">
-          <button class="fc-tab fc-on" data-p="1" onclick="fcSwitch(1)" style="padding:4px 13px;border-radius:7px;border:none;background:none;color:var(--text3);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .18s">1M</button>
-          <button class="fc-tab" data-p="3" onclick="fcSwitch(3)" style="padding:4px 13px;border-radius:7px;border:none;background:none;color:var(--text3);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .18s">3M</button>
-          <button class="fc-tab" data-p="6" onclick="fcSwitch(6)" style="padding:4px 13px;border-radius:7px;border:none;background:none;color:var(--text3);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .18s">6M</button>
-          <button class="fc-tab" data-p="12" onclick="fcSwitch(12)" style="padding:4px 13px;border-radius:7px;border:none;background:none;color:var(--text3);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .18s">1L</button>
+        <div style="display:flex;gap:3px;background:var(--bg3);border-radius:10px;padding:3px;border:1px solid var(--border2)">
+          <button class="fc-tab fc-on" data-p="1" onclick="fcSwitch(1)" style="padding:5px 14px;border-radius:8px;border:none;background:none;color:var(--text3);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .18s;letter-spacing:-.01em">1M</button>
+          <button class="fc-tab" data-p="3" onclick="fcSwitch(3)" style="padding:5px 14px;border-radius:8px;border:none;background:none;color:var(--text3);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .18s;letter-spacing:-.01em">3M</button>
+          <button class="fc-tab" data-p="6" onclick="fcSwitch(6)" style="padding:5px 14px;border-radius:8px;border:none;background:none;color:var(--text3);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .18s;letter-spacing:-.01em">6M</button>
+          <button class="fc-tab" data-p="12" onclick="fcSwitch(12)" style="padding:5px 14px;border-radius:8px;border:none;background:none;color:var(--text3);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .18s;letter-spacing:-.01em">1L</button>
         </div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:16px" id="fc-tiles"></div>
@@ -400,11 +435,11 @@ function rFin(){
         <svg id="fc-svg" style="width:100%;display:block;overflow:visible"></svg>
         <div id="fc-tip" style="position:absolute;background:var(--bg4);border:1px solid var(--border2);border-radius:9px;padding:9px 13px;font-size:11px;pointer-events:none;opacity:0;transition:opacity .12s;white-space:nowrap;z-index:20;box-shadow:0 4px 16px rgba(0,0,0,.4)"></div>
       </div>
-      <div style="display:flex;gap:14px;margin-top:12px;flex-wrap:wrap;justify-content:center">
-        <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3)"><span style="width:18px;height:2px;border-radius:1px;background:rgba(240,240,240,.4);display:inline-block"></span>Prihodki</span>
-        <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3)"><span style="width:9px;height:9px;border-radius:2px;background:#e85555;opacity:.82;display:inline-block"></span>Odhodki</span>
-        <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3)"><span style="width:9px;height:9px;border-radius:2px;background:#4f8ef7;opacity:.88;display:inline-block"></span>Varčevanje</span>
-        <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3)"><span style="width:9px;height:9px;border-radius:2px;background:#34c98a;opacity:.88;display:inline-block"></span>Preostanek</span>
+      <div style="display:flex;gap:16px;margin-top:14px;flex-wrap:wrap;justify-content:center">
+        <span style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:500;color:var(--text2)"><span style="width:20px;height:2px;border-radius:1px;background:#2dd87a;display:inline-block"></span>Prihodki</span>
+        <span style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:500;color:var(--text2)"><span style="width:10px;height:10px;border-radius:3px;background:#f05555;display:inline-block"></span>Odhodki</span>
+        <span style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:500;color:var(--text2)"><span style="width:10px;height:10px;border-radius:3px;background:#4f8ef7;display:inline-block"></span>Varčevanje</span>
+        <span style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:500;color:var(--text2)"><span style="width:10px;height:10px;border-radius:3px;background:#34c98a;display:inline-block"></span>Preostanek</span>
       </div>
     </div>`;
 
