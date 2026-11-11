@@ -653,6 +653,30 @@ function rVoz(){
   if(!db.services.length)h+=`<div class="empty">Ni servisov.</div>`;
   h+=`</div>`;
 
+  // servisna evidenca — tabela
+  h+=`<div style="margin-top:1rem;margin-bottom:.5rem"><div class="sub-l" style="margin:0 0 .5rem">Servisna evidenca</div>`;
+  h+=`<div class="tbl"><div class="th" style="grid-template-columns:1fr 1.4fr .9fr .9fr .9fr 28px"><span>Vozilo</span><span>Menjano</span><span>Datum</span><span>Deli</span><span>Delo</span><span></span></div>`;
+  [...db.services].sort((a,b)=>new Date(b.date)-new Date(a.date)).forEach(s=>{
+    const v=db.vehicles.find(x=>x.id===s.vehicleId);
+    const parts=s.parts&&s.parts.length?s.parts.map(p=>p.name).join(', '):(s.note||'—');
+    const totalParts=parseFloat(s.priceParts||0);
+    const totalLabour=parseFloat(s.priceLabour||0);
+    const totalPrice=parseFloat(s.price||0);
+    h+=`<div class="tr" style="grid-template-columns:1fr 1.4fr .9fr .9fr .9fr 28px;align-items:start">
+      <div>
+        <div style="font-weight:600;font-size:13px">${v?v.name:'—'}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">${v?v.reg:''}</div>
+      </div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.6">${parts}</div>
+      <div style="font-weight:600;font-size:13px;color:var(--text)">${s.date||'—'}</div>
+      <div style="font-variant-numeric:tabular-nums;font-size:13px;color:var(--text2)">${totalParts>0?euro(totalParts):'—'}</div>
+      <div style="font-variant-numeric:tabular-nums;font-size:13px;font-weight:600;color:var(--amber)">${totalPrice>0?euro(totalPrice):(totalLabour>0?euro(totalLabour):'—')}</div>
+      <button class="del" onclick="delI('services','${s.id}')">✕</button>
+    </div>`;
+  });
+  if(!db.services.length)h+=`<div class="empty">Ni servisov.</div>`;
+  h+=`</div></div>`;
+
   // zavarovanja
   h+=`<div style="display:flex;align-items:center;justify-content:space-between"><div class="sub-l" style="margin:0">Zavarovanja</div><button class="add" onclick="om('mo-ins');pvs('i-v')">+ Dodaj</button></div><div style="margin-bottom:.5rem"></div>`;
   h+=`<div class="tbl"><div class="th" style="grid-template-columns:2.2fr 1fr 1fr 1fr 1.2fr 28px"><span>Vrsta</span><span>Vozilo</span><span>Plačano</span><span>Znesek</span><span>Veljavnost</span><span></span></div>`;
